@@ -41,7 +41,7 @@ class AppKernel extends Kernel
     {
         $bundles = [
             // ...
-            new Futurolan\WeeezeventBundle\FuturolanWeezeventBundle(),
+            new Futurolan\WeezeventBundle\FuturolanWeezeventBundle(),
         ];
 
         // ...
