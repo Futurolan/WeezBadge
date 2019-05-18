@@ -44,6 +44,7 @@
     },
     "autoload": {
         "psr-4": {
+            "Futurolan\\WeezeventBundle\\": "lib/Futurolan/WeezeventBundle/",
             "App\\": "src/"
         }
     },
