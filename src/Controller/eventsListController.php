@@ -35,6 +35,7 @@ class eventsListController extends AbstractController
     {
         dump($this->weezeventClient->getEvents());
         return $this->render("listEvent/events.html.twig", [
+            'events' => $this->weezeventClient->getEvents(),
         ]);
     }
 }
