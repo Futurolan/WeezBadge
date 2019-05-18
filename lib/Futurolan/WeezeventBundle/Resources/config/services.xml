@@ -4,7 +4,10 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services
         http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
-        <service id="futurolan_weezevent.client.weezevent_client" class="Futurolan\WeezeventBundle\Client\WeezeventClient" public="true" />
+        <service id="futurolan_weezevent.client.weezevent_client" class="Futurolan\WeezeventBundle\Client\WeezeventClient" public="true">
+            <argument type="service" id="jms_serializer" />
+        </service>
+
         <service id="Futurolan\WeezeventBundle\Client\WeezeventClient" alias="futurolan_weezevent.client.weezevent_client" public="false" />
     </services>
 </container>

@@ -4,7 +4,6 @@
 namespace App\Controller;
 
 
-use Futurolan\WeezeventBundle\Client\WeezeventClient;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -15,18 +14,6 @@ use Symfony\Component\Routing\Annotation\Route;
 class homePageController extends AbstractController
 {
 
-    /** @var WeezeventClient */
-    private $weezeventClient;
-
-    /**
-     * homePageController constructor.
-     * @param WeezeventClient $weezeventClient
-     */
-    public function __construct(WeezeventClient $weezeventClient)
-    {
-        $this->weezeventClient = $weezeventClient;
-    }
-
     /**
      * @Route("/", name="homePage")
      */
@@ -35,9 +22,6 @@ class homePageController extends AbstractController
         if (is_null($this->getUser())) {
             return $this->redirectToRoute('loginPage');
         }
-
-        dump($this->weezeventClient->getApiKey());
-        dump($this->weezeventClient->getToken());
 
         return $this->render("home/home.html.twig", [
         ]);

@@ -26,7 +26,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('api')
                     ->info("API configuration")
                     ->children()
-                        ->scalarNode('url')->defaultValue('https://api.weezevent.com/events')->end()
+                        ->scalarNode('url')->defaultValue('https://api.weezevent.com/')->end()
                         ->scalarNode('key')->defaultNull()->end()
                         ->scalarNode('token')->defaultNull()->end()
                     ->end()
