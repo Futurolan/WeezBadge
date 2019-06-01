@@ -7,9 +7,11 @@ namespace Futurolan\WeezeventBundle\Client;
 
 use Futurolan\WeezeventBundle\Entity\Event;
 use Futurolan\WeezeventBundle\Entity\Events;
+use Futurolan\WeezeventBundle\Entity\Participant;
+use Futurolan\WeezeventBundle\Entity\Participants;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use JMS\Serializer\Serializer;
-use Psr\Http\Message\ResponseInterface;
 
 /**
  * Class WeezeventClient
@@ -44,29 +46,47 @@ class WeezeventClient
         $this->apiUrl = $apiUrl;
         $this->apiKey = $apiKey;
         $this->apiToken = $apiToken;
-        $this->client = new Client();
         $this->serializer = $serializer;
     }
 
     /**
-     * @return mixed|ResponseInterface
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @param bool $includeClosed
+     * @return Event[]
+     * @throws GuzzleException
      */
-    public function getEvents()
+    public function getEvents(bool $includeClosed = false)
     {
-        $url = $this->apiUrl.Constants::EVENTS_PATH;
-        $response = $this->client->request('GET', $this->buildUrl($url));
-        dump($response->getBody()->getContents());
+        $this->client = new Client();
+        $response = $this->client->request('GET', $this->buildQuery($this->apiUrl.Constants::EVENTS_PATH, ['include_closed' => ( $includeClosed ? 'true' : 'false' )]));
+        /** @var Events $data */
         $data = $this->serializer->deserialize($response->getBody(), Events::class, 'json');
 
-        return $data;
+        return $data->getEvents();
     }
 
-    private function buildUrl(string $url)
+    /**
+     * @param string $eventId
+     * @return Participant[]
+     * @throws GuzzleException
+     */
+    public function getParticipantsByEvent(string $eventId)
     {
-        return $url
-            ."?api_key=".$this->apiKey
-            ."&access_token=".$this->apiToken
-        ;
+        $this->client = new Client();
+        $response = $this->client->request('GET', $this->buildQuery($this->apiUrl.Constants::PARTICIPANT_LIST_PATH, ['id_event' => [$eventId]]));
+        dump($response->getBody()->getContents());
+        /** @var Participants $data */
+        $data = $this->serializer->deserialize($response->getBody(), Participants::class, 'json');
+        return $data->getParticipants();
+    }
+
+    /**
+     * @param string $url
+     * @param array $params
+     * @return string
+     */
+    private function buildQuery(string $url, array $params = [])
+    {
+        $query = http_build_query(array_merge(['api_key' => $this->apiKey, 'access_token' => $this->apiToken], $params));
+        return $url.'?'.$query;
     }
 }

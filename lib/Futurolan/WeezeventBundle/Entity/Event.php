@@ -6,6 +6,10 @@ namespace Futurolan\WeezeventBundle\Entity;
 
 use JMS\Serializer\Annotation as Serializer;
 
+/**
+ * Class Event
+ * @package Futurolan\WeezeventBundle\Entity
+ */
 class Event
 {
 
@@ -77,5 +81,67 @@ class Event
         $this->name = $name;
     }
 
+    /**
+     * @return int
+     */
+    public function getIdOrga(): int
+    {
+        return $this->id_orga;
+    }
 
+    /**
+     * @param int $id_orga
+     */
+    public function setIdOrga(int $id_orga): void
+    {
+        $this->id_orga = $id_orga;
+    }
+
+    /**
+     * @return Dates
+     */
+    public function getDate(): Dates
+    {
+        return $this->date;
+    }
+
+    /**
+     * @param Dates $date
+     */
+    public function setDate(Dates $date): void
+    {
+        $this->date = $date;
+    }
+
+    /**
+     * @return int
+     */
+    public function getParticipants(): int
+    {
+        return $this->participants;
+    }
+
+    /**
+     * @param int $participants
+     */
+    public function setParticipants(int $participants): void
+    {
+        $this->participants = $participants;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMultipleDates(): bool
+    {
+        return $this->multiple_dates;
+    }
+
+    /**
+     * @param bool $multiple_dates
+     */
+    public function setMultipleDates(bool $multiple_dates): void
+    {
+        $this->multiple_dates = $multiple_dates;
+    }
 }

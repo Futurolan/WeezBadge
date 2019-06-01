@@ -9,5 +9,9 @@
         </service>
 
         <service id="Futurolan\WeezeventBundle\Client\WeezeventClient" alias="futurolan_weezevent.client.weezevent_client" public="false" />
+
+        <service id="futurolan_weezevent.request_param_converter.weezevent_param_converter" class="Futurolan\WeezeventBundle\Request\ParamConverter\WeezeventParamConverter">
+            <tag name="request.param_converter" priority="-2" converter="futurolan_weezevent.request_param_converter.weezevent_param_converter" />
+        </service>
     </services>
 </container>
