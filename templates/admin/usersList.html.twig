@@ -16,7 +16,7 @@
                     {% endif %}
                     <div class="card-header text-white bg-primary">{{ user.name }}</div>
                     <div class="card-body">
-{#                        <p class="card-subtitle">{{ user.email }}</p>#}
+                        <p class="card-subtitle"><small>{{ user.email }}</small></p>
 {#                        <p class="card-subtitle">{{ user.readableRoles|join(', ', ' et ') }}</p>#}
                         {% for role in user.readableRoles %}
                             <span class="badge badge-primary">{{role}}</span>
