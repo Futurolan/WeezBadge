@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Controller;
+namespace App\Controller\Admin;
 
 
 use App\Entity\User;
@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Class adminController
  * @package App\Controller
- * @Security("is_granted('ROLE_ADMIN')")
+ * @Security("is_granted('ROLE_SUPER_ADMIN')")
  */
 class userAdministrationController extends AbstractController
 {

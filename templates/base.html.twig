@@ -30,7 +30,7 @@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav mr-auto">
                         {% block navBarBlock %}
-                            {% if is_granted('ROLE_USER') %}
+                            {% if is_granted('ROLE_ADMIN') %}
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ path('eventsListPage') }}">
                                         <i class="far fa-calendar-alt"></i>
@@ -40,7 +40,7 @@
                             {% endif %}
                             {% if is_granted('ROLE_ADMIN') %}
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ path('adminUsersListPage') }}">
+                                    <a class="nav-link" href="{{ path('adminPage') }}">
                                         <i class="fas fa-tools"></i>
                                         Admin
                                     </a>
@@ -79,10 +79,8 @@
 
         <script>
             $(function () {
-                var duration = 4000; // 4 seconds
-                setTimeout(function () { $('.alert-dismissible').fadeOut("fast"); }, duration);
+                setTimeout(function () { $('.alert-dismissible').fadeOut("fast"); }, 4000);
             });
-
         </script>
         {% block javascripts %}{% endblock %}
     </body>
