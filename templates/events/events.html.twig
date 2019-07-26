@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Events</h1>
+    <div class="row mt-4">
+        {% for event in events %}
+            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-2">
+                <div class="card border-dark mb-3 mx-4 mx-sm-3 mx-md-0">
+                    <div class="card-header text-white bg-primary">{{ event.name }}</div>
+                    <div class="card-body">
+                        <p class="card-text">Participants : {{ event.participants }}</p>
+                        <div class="card-text">From : {{ event.date.start|date('d/m/Y H:i:s') }}</div>
+                        <div class="card-text">To : {{ event.date.end|date('d/m/Y H:i:s') }}</div>
+                    </div>
+                    <div class="card-footer text-right">
+                        <a href="{{ path('eventTicketsListPage', {'eventID': event.id}) }}" class="btn btn-primary stretched-link">Participants</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

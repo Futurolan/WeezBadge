@@ -16,10 +16,10 @@
         </style>
         {% block stylesheets %}{% endblock %}
     </head>
-    <body class="bg-dark vh-100">
-        <div class="container-fluid d-flex h-100">
+    <body class="vh-100">
+        <div class="container-fluid d-flex h-100 px-0">
             <main class="d-flex flex-column px-0 w-100" role="main">
-                <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <nav class="navbar navbar-dark bg-primary navbar-expand-lg">
                     <a class="navbar-brand" href="{{ path('homePage') }}">
                         <i class="fas fa-id-badge"></i>
                         WeezBadge
@@ -30,6 +30,22 @@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav mr-auto">
                         {% block navBarBlock %}
+                            {% if is_granted('ROLE_USER') %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ path('eventsListPage') }}">
+                                        <i class="far fa-calendar-alt"></i>
+                                        Events
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ path('adminUsersListPage') }}">
+                                        <i class="fas fa-tools"></i>
+                                        Admin
+                                    </a>
+                                </li>
+                            {% endif %}
                         {% endblock %}
                         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                             <li class="nav-item">
@@ -43,8 +59,20 @@
                         {% block loggedInBlock %}{% endblock %}
                     </div>
                 </nav>
-                <div class="flex-row d-flex text-light p-md-5 mainContainer">
-                    {% block body %}{% endblock %}
+
+                {% for message in app.session.flashBag.get('success') %}
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+
+                <div class="flex-row d-flex p-1 p-md-5 mainContainer">
+                    <div class="container-fluid px-0">
+                        {% block body %}{% endblock %}
+                    </div>
                 </div>
             </main>
         </div>

@@ -120,6 +120,12 @@ class Participant
     private $owner;
 
     /**
+     * @var Answer[]
+     * @Serializer\Type("array<Futurolan\WeezeventBundle\Entity\Answer>")
+     */
+    private $answers;
+
+    /**
      * @return int
      */
     public function getIdParticipant(): int
@@ -261,5 +267,13 @@ class Participant
     public function getOwner(): Owner
     {
         return $this->owner;
+    }
+
+    /**
+     * @return Answer[]
+     */
+    public function getAnswers(): array
+    {
+        return $this->answers;
     }
 }

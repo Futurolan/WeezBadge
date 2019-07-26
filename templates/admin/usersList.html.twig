@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="float-right">
+        <a class="btn btn-primary mb-2" href="{{ path('adminNewUserPage') }}" role="button">Add User</a>
+    </div>
+    <h1>Users</h1>
+    <div class="row mt-4">
+        {% for user in users %}
+            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-2">
+                <div class="card border-dark mb-3 mx-4 mx-sm-3 mx-md-0">
+                    {% if user.pictureUrl is empty %}
+                        <img src="{{ asset('images/defaultProfilPicture.png') }}" class="card-img-top" alt="...">
+                    {% else %}
+                        <img src="{{ user.pictureUrl }}" class="card-img-top" alt="...">
+                    {% endif %}
+                    <div class="card-header text-white bg-primary">{{ user.name }}</div>
+                    <div class="card-body">
+{#                        <p class="card-subtitle">{{ user.email }}</p>#}
+{#                        <p class="card-subtitle">{{ user.readableRoles|join(', ', ' et ') }}</p>#}
+                        {% for role in user.readableRoles %}
+                            <span class="badge badge-primary">{{role}}</span>
+                        {% endfor %}
+                        {% if '@futurolan.net' in user.email %}
+                            <span class="badge badge-success">FuturoLAN</span>
+                        {% elseif '@eslgaming.com' in user.email %}
+                            <span class="badge badge-warning">ESL</span>
+                        {% else %}
+                            <span class="badge badge-danger">Externe</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer text-right">
+                        <a href="{{ path('eventTicketsListPage', {'eventID': user.id}) }}" class="btn btn-primary">Edit</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

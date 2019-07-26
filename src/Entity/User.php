@@ -4,12 +4,19 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  */
 class User implements UserInterface
 {
+    const ROLE_MAPPING = [
+        'ROLE_SUPER_ADMIN' => "Super Admin",
+        'ROLE_ADMIN' => "Admin",
+        'ROLE_USER' => "User",
+    ];
+
     /**
      * @var integer
      * @ORM\Id()
@@ -21,44 +28,51 @@ class User implements UserInterface
     /**
      * @var string
      * @ORM\Column(type="string", length=180, unique=true)
+     * @Assert\NotBlank()
+     * @Assert\Unique
+     * @Assert\Email(
+     *     message = "The email '{{ value }}' is not a valid email.",
+     *     checkMX = true
+     * )
      */
     private $email;
 
     /**
      * @var string
      * @ORM\Column(type="string", length=180)
+     * @Assert\NotBlank()
      */
     private $name;
 
     /**
      * @var string
-     * @ORM\Column(type="string", length=180)
+     * @ORM\Column(type="string", length=180, nullable=true)
      */
     private $givenName;
 
     /**
      * @var string
-     * @ORM\Column(type="string", length=180)
+     * @ORM\Column(type="string", length=180, nullable=true)
      */
     private $familyName;
 
     /**
      * @var string
-     * @ORM\Column(type="string", length=999)
+     * @ORM\Column(type="string", length=999, nullable=true)
      */
     private $pictureUrl;
 
     /**
      * @var string
-     * @ORM\Column(type="string", length=5)
+     * @ORM\Column(type="string", length=5, nullable=true)
      */
     private $locale;
 
     /**
      * @ORM\Column(type="json")
+     * @Assert\NotBlank()
      */
     private $roles = [];
-
 
     /**
      * @return int|null
@@ -103,14 +117,23 @@ class User implements UserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
+
         // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
+        if (empty($roles)) {
+            $roles[] = 'ROLE_USER';
+        }
 
         return array_unique($roles);
     }
 
-    public function setRoles(array $roles): self
+    /**
+     * @param $roles
+     * @return User
+     */
+    public function setRoles($roles): self
     {
+        if ( is_null($roles) ) { $roles = []; }
+        if ( is_string($roles) ) { $roles = [$roles]; }
         $this->roles = $roles;
 
         return $this;
@@ -142,9 +165,9 @@ class User implements UserInterface
     }
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -196,9 +219,9 @@ class User implements UserInterface
     }
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getPictureUrl(): string
+    public function getPictureUrl(): ?string
     {
         return $this->pictureUrl;
     }
@@ -229,5 +252,21 @@ class User implements UserInterface
     {
         $this->locale = $locale;
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getReadableRoles(): array
+    {
+        $readableRoles = [];
+        foreach($this->getRoles() as $role) {
+            if ( key_exists($role, self::ROLE_MAPPING) ) {
+                $readableRoles[] = self::ROLE_MAPPING[$role];
+            } else {
+                $readableRoles[] = $role;
+            }
+        }
+        return $readableRoles;
     }
 }

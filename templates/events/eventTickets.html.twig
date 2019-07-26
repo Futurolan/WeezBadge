@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>{{ eventTickets.name }}</h1>
+    <ul class="list-group">
+        {% for category in eventTickets.categories %}
+            <a class="list-group-item list-group-item-action list-group-item-primary" data-toggle="collapse" href="#collapseCategory_{{ category.id }}" role="button" aria-expanded="false" aria-controls="collapseCategory_{{ category.id }}">
+                <div class="card-body p-1 p-md-2">
+                    <h5 class="card-title mb-0">{{ category.name }}</h5>
+                </div>
+            </a>
+            <div class="collapse" id="collapseCategory_{{ category.id }}">
+                <ul class="list-group list-group-flush">
+                    {% for ticket in category.tickets %}
+                        <a class="list-group-item list-group-item-action" href="{{ path('eventParticipantsByTicketPage', {'eventID': eventTickets.id, 'ticketID': ticket.id}) }}">
+                            <div class="card-body ml-4 p-1 p-md-2">
+                                <h5 class="card-title mb-0">{{ ticket.name }}</h5>
+                                <p class="card-text">
+                                    Participants : {{ ticket.participants }}
+                                    {% if ticket.quotas > 0 %}
+                                        /{{ ticket.quotas }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    </ul>
+{% endblock %}

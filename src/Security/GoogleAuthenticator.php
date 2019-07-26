@@ -10,6 +10,7 @@ use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\OAuth2Client;
 use KnpU\OAuth2ClientBundle\Security\Authenticator\SocialAuthenticator;
 use League\OAuth2\Client\Provider\GoogleUser;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,15 +30,20 @@ class GoogleAuthenticator extends SocialAuthenticator
     /** @var EntityManagerInterface */
     private $em;
 
+    /** @var ParameterBagInterface */
+    private $params;
+
     /**
      * GoogleAuthenticator constructor.
      * @param ClientRegistry $clientRegistry
      * @param EntityManagerInterface $em
+     * @param ParameterBagInterface $params
      */
-    public function __construct(ClientRegistry $clientRegistry, EntityManagerInterface $em)
+    public function __construct(ClientRegistry $clientRegistry, EntityManagerInterface $em, ParameterBagInterface $params)
     {
         $this->clientRegistry = $clientRegistry;
         $this->em = $em;
+        $this->params = $params;
     }
 
     /**
@@ -66,19 +72,23 @@ class GoogleAuthenticator extends SocialAuthenticator
     {
         /** @var GoogleUser $googleUser */
         $googleUser = $this->getGoogleClient()->fetchUserFromToken($credentials);
-        //dump($googleUser);
 
         $user = $this->em->getRepository(User::class)->findOneBy(['email' => $googleUser->getEmail()]);
         if ( !$user instanceof User) {
+            if ( $this->params->get('super_admin_email') !== $googleUser->getEmail() ) { return null; }
             $user = new User;
             $user->setEmail($googleUser->getEmail());
+            $user->setRoles(['ROLE_SUPER_ADMIN']);
         }
 
-        $user->setFamilyName($googleUser->getLastName());
-        $user->setGivenName($googleUser->getFirstName());
         $user->setName($googleUser->getName());
         $user->setLocale($googleUser->getLocale());
         $user->setPictureUrl($googleUser->getAvatar());
+
+        if ( $this->params->get('super_admin_email') === $googleUser->getEmail() && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+            $user->setRoles(array_merge(['ROLE_SUPER_ADMIN'], $user->getRoles()));
+        }
+
         $this->em->persist($user);
         $this->em->flush();
 
@@ -113,7 +123,6 @@ class GoogleAuthenticator extends SocialAuthenticator
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
         $message = strtr($exception->getMessageKey(), $exception->getMessageData());
-
         return new Response($message, Response::HTTP_FORBIDDEN);
     }
 

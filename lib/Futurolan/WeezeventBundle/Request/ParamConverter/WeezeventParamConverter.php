@@ -31,8 +31,6 @@ class WeezeventParamConverter implements ParamConverterInterface
 
 
         // TODO: Implement apply() method.
-        dump($configuration);
-        dump($request);
     }
 
     /**
