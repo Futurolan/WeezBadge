@@ -60,7 +60,7 @@ class userAdministrationController extends AbstractController
         if ( $form->isSubmitted() && $form->isValid() ) {
             /** @var User $user */
             $user = $form->getData();
-            //dd($user);
+
             $this->em->persist($user);
             $this->em->flush();
 
@@ -69,7 +69,33 @@ class userAdministrationController extends AbstractController
             return $this->redirectToRoute('adminUsersListPage');
         }
 
-        return $this->render('admin/userForm.html.twig', [
+        return $this->render('admin/newUserForm.html.twig', [
+            'userForm' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/admin/user/{id}/edit", name="adminEditUserPage")
+     * @param User $user
+     * @param Request $request
+     * @return RedirectResponse|Response
+     */
+    public function editUser(User $user, Request $request)
+    {
+        $form = $this->createForm(UserFormType::class, $user);
+
+        $form->handleRequest($request);
+        if ( $form->isSubmitted() && $form->isValid() ) {
+
+            $this->em->persist($user);
+            $this->em->flush();
+
+            $this->addFlash('success', "User ".$user->getEmail()." edited successfully !");
+
+            return $this->redirectToRoute('adminUsersListPage');
+        }
+
+        return $this->render('admin/editUserForm.html.twig', [
             'userForm' => $form->createView(),
         ]);
     }

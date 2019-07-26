@@ -1,0 +1,8 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Create User</h1>
+    {{ include('admin/_userForm.html.twig', {
+        button_text: 'Create'
+    }) }}
+{% endblock %}

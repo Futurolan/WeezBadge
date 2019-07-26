@@ -130,8 +130,11 @@ class User implements UserInterface
     {
         if ( is_null($roles) ) { $roles = []; }
         if ( is_string($roles) ) { $roles = [$roles]; }
-        $this->roles = $roles;
 
+        if (count($roles) > 1 && in_array('ROLE_SUPER_ADMIN', $roles) ) {$roles = ['ROLE_SUPER_ADMIN'];}
+        if (count($roles) > 1 && in_array('ROLE_ADMIN', $roles) ) {$roles = ['ROLE_ADMIN'];}
+
+        $this->roles = $roles;
         return $this;
     }
 
