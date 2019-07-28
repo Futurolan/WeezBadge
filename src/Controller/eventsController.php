@@ -4,6 +4,7 @@
 namespace App\Controller;
 
 
+use App\Service\ParameterService;
 use Futurolan\WeezeventBundle\Client\WeezeventClient;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -32,6 +33,7 @@ class eventsController extends AbstractController
 
     /**
      * @Route("/events", name="eventsListPage")
+     * @Security("is_granted('ROLE_ADMIN')")
      */
     public function eventsListAction()
     {
@@ -46,6 +48,7 @@ class eventsController extends AbstractController
      * @param string $ticketID
      * @return Response
      * @throws GuzzleException
+     * @Security("is_granted('ROLE_ADMIN')")
      */
     public function eventParticipantsByTicketAction(string $eventID, string $ticketID)
     {
@@ -58,13 +61,15 @@ class eventsController extends AbstractController
     /**
      * @Route("/event/{eventID}", name="eventTicketsListPage")
      * @param string $eventID
+     * @param ParameterService $parameterService
      * @return Response
      * @throws GuzzleException
      */
-    public function eventTicketsAction(string $eventID)
+    public function eventTicketsAction(string $eventID, ParameterService $parameterService)
     {
         return $this->render("events/eventTickets.html.twig", [
             'eventTickets' => $this->weezeventClient->getTicketsByEvent($eventID),
+            'DefaultCategory' => $parameterService->get($parameterService::DEFAULT_CATEGORY_NAME),
         ]);
     }
 

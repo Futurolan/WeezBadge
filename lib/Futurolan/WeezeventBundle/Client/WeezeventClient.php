@@ -113,6 +113,23 @@ class WeezeventClient
 
     /**
      * @param string $eventId
+     * @param string $categoryId
+     * @return Ticket[]|null
+     * @throws GuzzleException
+     */
+    public function getCategory(string $eventId, string $categoryId)
+    {
+        $eventTicket = $this->getTicketsByEvent($eventId);
+        foreach($eventTicket->getCategories() as $category) {
+            if ( $category->getId() === (int)$categoryId ) {
+                return $category->getTickets();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param string $eventId
      * @param string $ticketId
      * @return Ticket|null
      * @throws GuzzleException

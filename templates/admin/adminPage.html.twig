@@ -6,11 +6,10 @@
         {% for module in modules %}
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-2 px-5 text-center">
                 <a href="{{ path( module.route ) }}" class="btn btn-outline-primary mb-3 mx-0 btn-lg btn-block" role="button">
-                        <i class="{{ module.icon }} fa-5x"></i>
-                        <h1>{{ module.name }}</h1>
+                    <i class="{{ module.icon }} fa-5x"></i>
+                    <h1>{{ module.name }}</h1>
                 </a>
             </div>
         {% endfor %}
     </div>
 {% endblock %}
-
