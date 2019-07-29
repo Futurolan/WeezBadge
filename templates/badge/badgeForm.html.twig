@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Create Badge</h1>
+    {{ form_start(badgeForm) }}
+        {{ form_row(badgeForm.prenom) }}
+        {{ form_row(badgeForm.nom) }}
+        {{ form_row(badgeForm.email) }}
+        {{ form_row(badgeForm.societe) }}
+        {{ form_row(badgeForm.fonction) }}
+        {{ form_row(badgeForm.notify) }}
+        <button type="submit" class="btn btn-primary" formnovalidate>Create</button>
+    {{ form_end(badgeForm) }}
+{% endblock %}

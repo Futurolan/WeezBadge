@@ -2,7 +2,7 @@
     <li class="nav-item">
         <a class="nav-link" href="{{ path('eventParticipantsByTicketPage', {'eventID': eventID, 'ticketID': ticket.id}) }}">
             <i class="fas fa-id-badge"></i>
-            {{ ticket.name}} ({{ ticket.participants }})
+            {{ ticket.name|title}} ({{ ticket.participants }})
         </a>
     </li>
-{% endfor %} 
+{% endfor %}

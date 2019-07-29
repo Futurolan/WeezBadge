@@ -1,0 +1,17 @@
+{
+    "participants":[
+        {
+        "id_evenement":'.$app['weezevent.id_event'].',
+        "id_billet":'.$data['id_ticket'].',
+        "email":"'.$data['email'].'",
+        "nom":"'.$data['lastname'].'",
+        "prenom":"'.$data['firstname'].'",
+        "form":{
+            "societe": "'.$data['society'].'",
+            "fonction": "'.$data['fonction'].'"
+            },
+        "notify": "'.$notify.'"
+        }
+    ],
+    "return_ticket_url":1
+}

@@ -48,7 +48,7 @@ class eventsController extends AbstractController
      * @param string $ticketID
      * @return Response
      * @throws GuzzleException
-     * @Security("is_granted('ROLE_ADMIN')")
+     * @Security("is_granted('ROLE_USER')")
      */
     public function eventParticipantsByTicketAction(string $eventID, string $ticketID)
     {
