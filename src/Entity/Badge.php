@@ -36,6 +36,11 @@ class Badge
 
     /**
      * @var string|null
+     */
+    private $pseudo;
+
+    /**
+     * @var string|null
      * @Assert\NotBlank
      */
     private $societe;
@@ -177,5 +182,21 @@ class Badge
     public function setNotify(?bool $notify): void
     {
         $this->notify = $notify;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPseudo(): ?string
+    {
+        return $this->pseudo;
+    }
+
+    /**
+     * @param string|null $pseudo
+     */
+    public function setPseudo(?string $pseudo): void
+    {
+        $this->pseudo = $pseudo;
     }
 }

@@ -10,4 +10,5 @@ class Constants
     const EVENTS_PATH = 'events';
     const PARTICIPANT_LIST_PATH = 'participant/list';
     const TICKETS_PATH = 'tickets';
+    const PARTICIPANTS_DELETE_PATH = 'v3/participants';
 }

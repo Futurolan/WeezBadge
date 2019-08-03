@@ -3,8 +3,6 @@
 
 namespace Futurolan\WeezeventBundle\Client;
 
-
-
 use Futurolan\WeezeventBundle\Entity\Event;
 use Futurolan\WeezeventBundle\Entity\Events;
 use Futurolan\WeezeventBundle\Entity\EventTicket;
@@ -143,6 +141,31 @@ class WeezeventClient
             }
         }
         return null;
+    }
+
+    /**
+     * Delete Participant
+     * https://api.weezevent.com/doc/v3#participantsdelete
+     *
+     * @param string $eventId
+     * @param string $participantId
+     * @return bool
+     * @throws GuzzleException
+     */
+    public function deleteParticipant(string $eventId, string $participantId)
+    {
+        $this->client = new Client();
+        $data = $this->serializer->serialize(['participants' => [['id_evenement' => (int)$eventId, 'id_participant' => $participantId]]], 'json');
+        $response = $this->client->request('DELETE', $this->buildQuery($this->apiUrl.Constants::PARTICIPANTS_DELETE_PATH, []),
+            [
+                'form_params' => array('data' => $data)
+            ]
+        );
+        $responseArray = $this->serializer->deserialize($response->getBody(), 'array', 'json');
+        if ( key_exists('total_deleted', $responseArray) && $responseArray['total_deleted'] === 1 ) {
+            return true;
+        }
+        return false;
     }
 
     /**

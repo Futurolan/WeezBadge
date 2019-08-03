@@ -23,12 +23,24 @@ class BadgeFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('prenom', TextType::class, [])
+            ->add('prenom', TextType::class, [
+                'label' => "Prénom",
+            ])
             ->add('nom', TextType::class, [])
-            ->add('email', EmailType::class, [])
-            ->add('societe', TextType::class, [])
+            ->add('pseudo', TextType::class, [])
+            ->add('email', EmailType::class, [
+                'label' => "Adresse email",
+                'help' => "Obligatoire, le badge sera envoyé à cette adresse.",
+            ])
+            ->add('societe', TextType::class, [
+                'label' => "Société",
+            ])
             ->add('fonction', TextType::class, [])
-            ->add('notify', CheckboxType::class, [])
+            ->add('notify', CheckboxType::class, [
+                'label' => "Notification",
+                'help' => "Un email sera automatiquement envoyé par Weezevent à l'adresse email si la notification est activée.",
+                'data' => true,
+            ])
             ;
 
 

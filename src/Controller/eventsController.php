@@ -3,7 +3,6 @@
 
 namespace App\Controller;
 
-
 use App\Service\ParameterService;
 use Futurolan\WeezeventBundle\Client\WeezeventClient;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
