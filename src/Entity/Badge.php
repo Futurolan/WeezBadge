@@ -9,13 +9,20 @@ class Badge
 {
     /**
      * @var int|null
+     * @Assert\NotBlank
+     * @Assert\GreaterThan(0)
      */
-    private $id_evenement;
+    private $eventID;
 
     /**
      * @var int|null
+     * @Assert\NotBlank
+     * @Assert\GreaterThan(
+     *     value = 0,
+     *     message = "Le type de badge doit être défini."
+     * )
      */
-    private $id_billet;
+    private $ticketID;
 
     /**
      * @var string|null
@@ -25,6 +32,7 @@ class Badge
 
     /**
      * @var string|null
+     * @Assert\NotBlank
      */
     private $nom;
 
@@ -47,7 +55,6 @@ class Badge
 
     /**
      * @var string|null
-     * @Assert\NotBlank
      */
     private $fonction;
 
@@ -59,33 +66,35 @@ class Badge
     /**
      * @return int|null
      */
-    public function getIdEvenement(): ?int
+    public function getEventID(): ?int
     {
-        return $this->id_evenement;
+        return $this->eventID;
     }
 
     /**
-     * @param int|null $id_evenement
+     * @param mixed $eventID
      */
-    public function setIdEvenement(?int $id_evenement): void
+    public function setEventID($eventID): void
     {
-        $this->id_evenement = $id_evenement;
+        if ( !is_null($eventID) ) { $eventID = (int)$eventID; }
+        $this->eventID = $eventID;
     }
 
     /**
      * @return int|null
      */
-    public function getIdBillet(): ?int
+    public function getTicketID(): ?int
     {
-        return $this->id_billet;
+        return $this->ticketID;
     }
 
     /**
-     * @param int|null $id_billet
+     * @param mixed $ticketID
      */
-    public function setIdBillet(?int $id_billet): void
+    public function setTicketID($ticketID): void
     {
-        $this->id_billet = $id_billet;
+        if ( !is_null($ticketID) ) { $ticketID = (int)$ticketID; }
+        $this->ticketID = $ticketID;
     }
 
     /**

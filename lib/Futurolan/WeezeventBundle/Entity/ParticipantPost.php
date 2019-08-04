@@ -192,4 +192,20 @@ class ParticipantPost
     {
         $this->form = $form;
     }
+
+    /**
+     * @return bool
+     */
+    public function isNotify(): bool
+    {
+        return $this->notify;
+    }
+
+    /**
+     * @param bool $notify
+     */
+    public function setNotify(bool $notify): void
+    {
+        $this->notify = $notify;
+    }
 }

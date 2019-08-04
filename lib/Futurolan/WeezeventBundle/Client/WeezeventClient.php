@@ -8,6 +8,7 @@ use Futurolan\WeezeventBundle\Entity\Events;
 use Futurolan\WeezeventBundle\Entity\EventTicket;
 use Futurolan\WeezeventBundle\Entity\EventTickets;
 use Futurolan\WeezeventBundle\Entity\Participant;
+use Futurolan\WeezeventBundle\Entity\ParticipantPost;
 use Futurolan\WeezeventBundle\Entity\Participants;
 use Futurolan\WeezeventBundle\Entity\Ticket;
 use GuzzleHttp\Client;
@@ -58,7 +59,10 @@ class WeezeventClient
     public function getEvents(bool $includeClosed = false)
     {
         $this->client = new Client();
-        $response = $this->client->request('GET', $this->buildQuery($this->apiUrl.Constants::EVENTS_PATH, ['include_closed' => ( $includeClosed ? 'true' : 'false' )]));
+        $response = $this->client->request('GET', $this->buildQuery($this->apiUrl.Constants::EVENTS_PATH, [
+            'include_closed' => ( $includeClosed ? 'true' : 'false' ),
+            'include_without_sales' => true,
+        ]));
         /** @var Events $data */
         $data = $this->serializer->deserialize($response->getBody(), Events::class, 'json');
 
@@ -143,6 +147,22 @@ class WeezeventClient
         return null;
     }
 
+    public function addParticipant(ParticipantPost $participant)
+    {
+        $this->client = new Client();
+        $data = ['participants' => [$participant], 'return_ticket_url' => false];
+        $response = $this->client->request('POST', $this->buildQuery($this->apiUrl.Constants::PARTICIPANTS_PATH, []),
+            [
+                'form_params' => array('data' => $this->serializer->serialize($data, 'json'))
+            ]
+        );
+        $responseArray = $this->serializer->deserialize($response->getBody(), 'array', 'json');
+        if ( key_exists('total_added', $responseArray) && $responseArray['total_added'] === 1 ) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Delete Participant
      * https://api.weezevent.com/doc/v3#participantsdelete
@@ -156,7 +176,7 @@ class WeezeventClient
     {
         $this->client = new Client();
         $data = $this->serializer->serialize(['participants' => [['id_evenement' => (int)$eventId, 'id_participant' => $participantId]]], 'json');
-        $response = $this->client->request('DELETE', $this->buildQuery($this->apiUrl.Constants::PARTICIPANTS_DELETE_PATH, []),
+        $response = $this->client->request('DELETE', $this->buildQuery($this->apiUrl.Constants::PARTICIPANTS_PATH, []),
             [
                 'form_params' => array('data' => $data)
             ]

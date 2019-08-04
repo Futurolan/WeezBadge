@@ -3,9 +3,11 @@
 
 namespace App\Form;
 
+use App\Controller\BadgeController;
 use App\Entity\Badge;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -17,12 +19,33 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class BadgeFormType extends AbstractType
 {
+
+    /** @var BadgeController */
+    private $badgeController;
+
+    /**
+     * createBadgeController constructor.
+     * @param BadgeController $badgeController
+     */
+    public function __construct(BadgeController $badgeController)
+    {
+        $this->badgeController = $badgeController;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->add('eventID', ChoiceType::class, [
+                'label' => "Événement",
+                'choices' => $this->badgeController->getAllowedEvent(),
+            ])
+            ->add('ticketID', ChoiceType::class, [
+                'label' => "Badge",
+                'choices' => $this->badgeController->getAllowedTickets(),
+            ])
             ->add('prenom', TextType::class, [
                 'label' => "Prénom",
             ])
@@ -38,7 +61,7 @@ class BadgeFormType extends AbstractType
             ->add('fonction', TextType::class, [])
             ->add('notify', CheckboxType::class, [
                 'label' => "Notification",
-                'help' => "Un email sera automatiquement envoyé par Weezevent à l'adresse email si la notification est activée.",
+                'help' => "Envoi automatique par Weezevent d'un email contenant le billet à l'adresse email du destinataire.",
                 'data' => true,
             ])
             ;
@@ -55,6 +78,5 @@ class BadgeFormType extends AbstractType
             'data_class' => Badge::class,
         ]);
     }
-
 
 }
