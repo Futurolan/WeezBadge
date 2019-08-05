@@ -1,17 +1,39 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Create Badge</h1>
+    <h1 class="mb-4">Nouveau Badge</h1>
     {{ form_start(badgeForm) }}
-{#        {{ form_row(badgeForm.eventID) }}#}
-        {{ form_row(badgeForm.ticketID) }}
-        {{ form_row(badgeForm.prenom) }}
-        {{ form_row(badgeForm.nom) }}
-        {{ form_row(badgeForm.pseudo) }}
-        {{ form_row(badgeForm.email) }}
-        {{ form_row(badgeForm.societe) }}
-        {{ form_row(badgeForm.fonction) }}
-        {{ form_row(badgeForm.notify) }}
-        <button type="submit" class="btn btn-primary" formnovalidate>Create</button>
+        <div class="row mb-5">
+            <div class="d-none">
+                {{ form_row(badgeForm.eventID) }}
+            </div>
+            <div class="col-12">
+                {{ form_row(badgeForm.ticketID) }}
+            </div>
+            <div class="col-12 col-md-6">
+                {{ form_row(badgeForm.prenom) }}
+            </div>
+            <div class="col-12 col-md-6">
+                {{ form_row(badgeForm.nom) }}
+            </div>
+            <div class="col-12 col-md-6">
+                {{ form_row(badgeForm.pseudo) }}
+            </div>
+            <div class="col-12 col-md-6">
+                {{ form_row(badgeForm.email) }}
+            </div>
+            <div class="col-12 col-md-6">
+                {{ form_row(badgeForm.societe) }}
+            </div>
+            <div class="col-12 col-md-6">
+                {{ form_row(badgeForm.fonction) }}
+            </div>
+            <div class="col-12">
+                {{ form_row(badgeForm.notify) }}
+            </div>
+            <div class="col-12 my-3">
+                <button type="submit" class="btn btn-primary" formnovalidate>Créer le badge</button>
+            </div>
+        </div>
     {{ form_end(badgeForm) }}
 {% endblock %}

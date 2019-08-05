@@ -45,7 +45,6 @@ class BadgeController extends AbstractController
         $this->parameterService = $parameterService;
     }
 
-
     /**
      * @Route("/event/{eventID}/ticket/{ticketID}/delete/{participantID}", name="deleteParticipant")
      * @param string $eventID
@@ -57,6 +56,7 @@ class BadgeController extends AbstractController
     public function deleteParticipant(string $eventID, string $ticketID, string $participantID)
     {
         $this->weezeventClient->deleteParticipant($eventID, $participantID);
+        $this->addFlash('success', "Badge supprimé avec succès !");
         return $this->redirectToRoute('eventParticipantsByTicketPage', ['eventID' => $eventID, 'ticketID' => $ticketID]);
     }
 
@@ -73,14 +73,10 @@ class BadgeController extends AbstractController
         if ( $form->isSubmitted() && $form->isValid() ) {
             /** @var Badge $badge */
             $badge = $form->getData();
-            $participant = $this->badge2ParticipantForm($badge);
+            $this->weezeventClient->addParticipant($this->badge2ParticipantForm($badge));
 
-            $this->weezeventClient->addParticipant($participant);
-
-
-            dump($participant);
-            dump($this->serializer->serialize($participant, 'json'));
-            dd($badge);
+            $this->addFlash('success', "Badge créé avec succès !");
+            return $this->redirectToRoute('eventParticipantsByTicketPage', ['eventID' => $badge->getEventID(), 'ticketID' => $badge->getTicketID()]);
         }
 
         return $this->render('badge/badgeForm.html.twig', [
@@ -95,11 +91,11 @@ class BadgeController extends AbstractController
     public function getAllowedEvent()
     {
         $res = [];
-        $events = $this->weezeventClient->getEvents(true);
+        $events = $this->weezeventClient->getEvents(false);
         $defaultCategory = $this->parameterService->get($this->parameterService::DEFAULT_CATEGORY_NAME);
         foreach ($events as $event) {
-            if ( (int)$defaultCategory['eventID'] === $event->getId() || $this->isGranted('ROLE_ADMIN') )
-            $res[$event->getName()] = (int)$event->getId();
+            if ( (int)$defaultCategory['eventID'] === $event->getId() )
+            $res[ucwords(strtolower($event->getName()))] = (int)$event->getId();
         }
         return $res;
     }
@@ -116,7 +112,7 @@ class BadgeController extends AbstractController
         $tickets = $this->weezeventClient->getCategory($defaultCategory['eventID'], $defaultCategory['categoryID']);
 
         foreach ($tickets as $ticket) {
-            $res[$ticket->getName()] = (int)$ticket->getId();
+            $res[ucwords(strtolower($ticket->getName()))] = (int)$ticket->getId();
         }
         return $res;
     }
@@ -130,8 +126,12 @@ class BadgeController extends AbstractController
         $participant = new ParticipantPost();
         $participant->setIdEvenement($badge->getEventID());
         $participant->setIdBillet($badge->getTicketID());
-        $participant->setNom($badge->getNom());
-        $participant->setPrenom($badge->getPrenom());
+        $participant->setNom(strtoupper($badge->getNom()));
+
+        $prenom = $badge->getPrenom();
+        if ( !empty($badge->getPseudo()) ) { $prenom .= " «".$badge->getPseudo()."»"; }
+
+        $participant->setPrenom($prenom);
         $participant->setEmail($badge->getEmail());
         $participant->setNotify($badge->getNotify());
 
