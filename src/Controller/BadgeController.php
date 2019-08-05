@@ -5,6 +5,7 @@ namespace App\Controller;
 
 use App\Entity\Badge;
 use App\Form\BadgeFormType;
+use App\Form\ImportFormType;
 use App\Service\ParameterService;
 use Futurolan\WeezeventBundle\Client\WeezeventClient;
 use Futurolan\WeezeventBundle\Entity\ParticipantForm;
@@ -81,6 +82,27 @@ class BadgeController extends AbstractController
 
         return $this->render('badge/badgeForm.html.twig', [
             'badgeForm' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/badge/import", name="importBadgesPage")
+     * @param Request $request
+     * @return Response
+     */
+    public function importBadge(Request $request)
+    {
+        $form = $this->createForm(ImportFormType::class, null, []);
+
+        $form->handleRequest($request);
+        if ( $form->isSubmitted() && $form->isValid() ) {
+            /** @var Badge $badge */
+            $import = $form->getData();
+            dd($import);
+        }
+
+        return $this->render('badge/badgeImport.html.twig', [
+            'importForm' => $form->createView(),
         ]);
     }
 

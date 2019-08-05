@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1 class="mb-4">Import de Badges</h1>
+    {{ form_start(importForm) }}
+    <div class="row mb-5">
+        <div class="d-none">
+            {{ form_row(importForm.eventID) }}
+        </div>
+        <div class="col-12">
+            {{ form_row(importForm.ticketID) }}
+        </div>
+        <div class="col-12">
+            {{ form_row(importForm.csv, {
+                attr: {'rows': 10}
+            }) }}
+        </div>
+        <div class="col-12">
+            {{ form_row(importForm.notify) }}
+        </div>
+        <div class="col-12 my-3">
+            <button type="submit" class="btn btn-primary" formnovalidate>Importer les badges</button>
+        </div>
+    </div>
+    {{ form_end(importForm) }}
+{% endblock %}

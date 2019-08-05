@@ -1,3 +1,18 @@
+{% if is_granted('ROLE_USER') %}
+    <li class="nav-item">
+        <a class="nav-link" href="{{ path('newBadgePage') }}">
+            <i class="fas fa-plus-circle"></i>
+            Nouveau Badge
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ path('importBadgesPage') }}">
+            <i class="fas fa-upload"></i>
+            Import
+        </a>
+    </li>
+{% endif %}
+
 {% for ticket in tickets %}
     <li class="nav-item">
         <a class="nav-link" href="{{ path('eventParticipantsByTicketPage', {'eventID': eventID, 'ticketID': ticket.id}) }}">
@@ -6,3 +21,12 @@
         </a>
     </li>
 {% endfor %}
+
+{% if is_granted('ROLE_ADMIN') %}
+    <li class="nav-item">
+        <a class="nav-link" href="{{ path('adminPage') }}">
+            <i class="fas fa-tools"></i>
+            Administration
+        </a>
+    </li>
+{% endif %}
