@@ -4,6 +4,7 @@
 namespace App\Entity;
 
 use Symfony\Component\Validator\Constraints as Assert;
+use JMS\Serializer\Annotation as Serializer;
 
 class Badge
 {
@@ -11,6 +12,7 @@ class Badge
      * @var int|null
      * @Assert\NotBlank
      * @Assert\GreaterThan(0)
+     * @Serializer\Type("int")
      */
     private $eventID;
 
@@ -21,45 +23,54 @@ class Badge
      *     value = 0,
      *     message = "Le type de badge doit être défini."
      * )
+     * @Serializer\Type("int")
      */
     private $ticketID;
 
     /**
      * @var string|null
      * @Assert\NotBlank
+     * @Assert\Email
+     * @Serializer\Type("string")
      */
     private $email;
 
     /**
      * @var string|null
      * @Assert\NotBlank
+     * @Serializer\Type("string")
      */
     private $nom;
 
     /**
      * @var string|null
      * @Assert\NotBlank
+     * @Serializer\Type("string")
      */
     private $prenom;
 
     /**
      * @var string|null
+     * @Serializer\Type("string")
      */
     private $pseudo;
 
     /**
      * @var string|null
      * @Assert\NotBlank
+     * @Serializer\Type("string")
      */
     private $societe;
 
     /**
      * @var string|null
+     * @Serializer\Type("string")
      */
     private $fonction;
 
     /**
      * @var bool|null
+     * @Serializer\Type("bool")
      */
     private $notify;
 

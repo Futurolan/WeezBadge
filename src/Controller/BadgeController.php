@@ -4,6 +4,7 @@
 namespace App\Controller;
 
 use App\Entity\Badge;
+use App\Entity\Import;
 use App\Form\BadgeFormType;
 use App\Form\ImportFormType;
 use App\Service\ParameterService;
@@ -11,11 +12,13 @@ use Futurolan\WeezeventBundle\Client\WeezeventClient;
 use Futurolan\WeezeventBundle\Entity\ParticipantForm;
 use Futurolan\WeezeventBundle\Entity\ParticipantPost;
 use JMS\Serializer\SerializerInterface;
+use League\Csv\Reader;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use GuzzleHttp\Exception\GuzzleException;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Class createBadgeController
@@ -33,21 +36,26 @@ class BadgeController extends AbstractController
     /** @var ParameterService */
     private $parameterService;
 
+    /** @var ValidatorInterface */
+    private $validator;
+
     /**
      * createBadgeController constructor.
      * @param SerializerInterface $serializer
      * @param WeezeventClient $weezeventClient
      * @param ParameterService $parameterService
+     * @param ValidatorInterface $validator
      */
-    public function __construct(SerializerInterface $serializer, WeezeventClient $weezeventClient, ParameterService $parameterService)
+    public function __construct(SerializerInterface $serializer, WeezeventClient $weezeventClient, ParameterService $parameterService, ValidatorInterface $validator)
     {
         $this->serializer = $serializer;
         $this->weezeventClient = $weezeventClient;
         $this->parameterService = $parameterService;
+        $this->validator = $validator;
     }
 
     /**
-     * @Route("/event/{eventID}/ticket/{ticketID}/delete/{participantID}", name="deleteParticipant")
+     * @Route("/event/{eventID}/ticket/{ticketID}/delete/{participantID}", methods={"GET"}, name="deleteParticipant")
      * @param string $eventID
      * @param string $ticketID
      * @param string $participantID
@@ -65,6 +73,7 @@ class BadgeController extends AbstractController
      * @Route("/badge/new", name="newBadgePage")
      * @param Request $request
      * @return Response
+     * @throws GuzzleException
      */
     public function createBadge(Request $request)
     {
@@ -98,12 +107,72 @@ class BadgeController extends AbstractController
         if ( $form->isSubmitted() && $form->isValid() ) {
             /** @var Badge $badge */
             $import = $form->getData();
-            dd($import);
+            $badges = $this->importToBadges($import);
+            return $this->render('badge/badgesConfirm.html.twig', [
+                'badges' => $badges,
+                'eventID' => $import->getEventID(),
+                'ticketID' => $import->getTicketID(),
+                'json' => $this->serializer->serialize($badges, 'json'),
+            ]);
         }
 
-        return $this->render('badge/badgeImport.html.twig', [
+        return $this->render('badge/badgesImport.html.twig', [
             'importForm' => $form->createView(),
         ]);
+    }
+
+    /**
+     * @Route("/badge/import/confirm", methods={"POST"}, name="confirmImportBadgesPage")
+     * @param Request $request
+     * @return Response
+     * @throws GuzzleException
+     */
+    public function confirmImportBadges(Request $request)
+    {
+        $badges = $this->serializer->deserialize($request->getContent(), 'array<App\Entity\Badge>', 'json');
+        $participants = [];
+        foreach ($badges as $badge) { $participants[] = $this->badge2ParticipantForm($badge); }
+
+        try{
+            $this->weezeventClient->addParticipants($participants);
+        } catch(\Exception $e) {
+            return new Response($e->getMessage(), 500);
+        }
+
+        return new Response(null, 204);
+    }
+
+    /**
+     * @param Import $import
+     * @return array
+     */
+    private function importToBadges(Import $import)
+    {
+        $badges = [];
+
+        $reader = Reader::createFromString($import->getCsv());
+        $records = $reader->getRecords(['nom', 'prenom', 'pseudo', 'societe', 'fonction', 'email']);
+        foreach ($records as $offset => $record) {
+            if ( !empty($record['email']) ) {
+                $badge = new Badge();
+                $badge->setEventID($import->getEventID());
+                $badge->setTicketID($import->getTicketID());
+                $badge->setNom($record['nom']);
+                $badge->setPrenom($record['prenom']);
+                $badge->setPseudo($record['pseudo']);
+                $badge->setSociete($record['societe']);
+                $badge->setFonction($record['fonction']);
+                $badge->setEmail($record['email']);
+                $badge->setNotify($import->getNotify());
+                $errors = $this->validator->validate($badge);
+
+                if ( count($errors) === 0 ) {
+                    $badges[] = $badge;
+                }
+            }
+        }
+
+        return $badges;
     }
 
     /**

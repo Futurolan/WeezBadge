@@ -147,10 +147,28 @@ class WeezeventClient
         return null;
     }
 
+    /**
+     * @param ParticipantPost $participant
+     * @return bool
+     * @throws GuzzleException
+     */
     public function addParticipant(ParticipantPost $participant)
     {
+        return $this->addParticipants([$participant]);
+    }
+
+    /**
+     * Add an array of ParticipantPost to Weezevent
+     *
+     * @param ParticipantPost[] $participants
+     * @return bool
+     * @throws GuzzleException
+     */
+    public function addParticipants(array $participants)
+    {
+        if ( empty($participants) ) { return false; }
         $this->client = new Client();
-        $data = ['participants' => [$participant], 'return_ticket_url' => false];
+        $data = ['participants' => $participants, 'return_ticket_url' => false];
         $response = $this->client->request('POST', $this->buildQuery($this->apiUrl.Constants::PARTICIPANTS_PATH, []),
             [
                 'form_params' => array('data' => $this->serializer->serialize($data, 'json'))

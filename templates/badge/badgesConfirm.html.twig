@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1 class="mb-4">Import de Badges - Confirmation</h1>
+
+    <div class="alert alert-primary mb-5" role="alert">
+        Voici la liste des badges qui vont être créés.
+    </div>
+
+    <div class="row">
+        {% for badge in badges %}
+            <div class="col-xs-12 col-sm-6 col-lg-4 col-xl-3 mb-2">
+                <div class="card border-dark mb-3 mx-4 mx-sm-3 mx-md-0 text-center">
+                    <div class="card-header text-white bg-primary">
+                        <h4 class="mb-0">{{ badge.prenom }}{% if badge.pseudo is not empty %} "{{ badge.pseudo }}"{% endif %} {{ badge.nom|upper }}</h4>
+                    </div>
+                    <div class="card-body ">
+                        <h4>{{ badge.societe }}</h4>
+                        <h5 class="mb-0">{{ badge.fonction }}</h5>
+                    </div>
+                    <div class="card-footer text-muted">
+                        <p class="card-subtitle">{{ badge.email }}</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="alert alert-danger d-none js-alert-box" role="alert"></div>
+
+    <button type="submit" class="btn btn-primary my-3 js-import-btn">Créer les badges</button>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    $(function () {
+        $('.js-import-btn').on('click', null, function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            let $button = $(e.currentTarget);
+            $button.attr('disabled', true).html("Création des badges en cours...").prepend($('<i></i>').addClass('fas fa-spinner fa-spin mr-2'));
+            $.ajax({
+                url: "{{ path('confirmImportBadgesPage') }}",
+                type: 'POST',
+                data: JSON.stringify({{ json | raw }}),
+                success: function () {
+                    window.location.replace("{{ path('eventParticipantsByTicketPage', {'eventID': eventID, 'ticketID': ticketID}) }}");
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    $button.removeClass('btn-primary').addClass('btn-danger').html("Une erreur est survenue !").prepend($('<i></i>').addClass('fas fa-exclamation-triangle mr-2'));
+                    $('.js-alert-box').removeClass('d-none').html( errorThrown + ( jqXHR.responseText !== undefined ? ': '+jqXHR.responseText : '' ));
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

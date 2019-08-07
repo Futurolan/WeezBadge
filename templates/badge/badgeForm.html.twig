@@ -2,7 +2,7 @@
 
 {% block body %}
     <h1 class="mb-4">Nouveau Badge</h1>
-    {{ form_start(badgeForm) }}
+    {{ form_start(badgeForm, {'attr': {'novalidate': 'novalidate'}}) }}
         <div class="row mb-5">
             <div class="d-none">
                 {{ form_row(badgeForm.eventID) }}

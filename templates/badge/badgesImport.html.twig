@@ -2,7 +2,7 @@
 
 {% block body %}
     <h1 class="mb-4">Import de Badges</h1>
-    {{ form_start(importForm) }}
+    {{ form_start(importForm, {'attr': {'novalidate': 'novalidate'}}) }}
     <div class="row mb-5">
         <div class="d-none">
             {{ form_row(importForm.eventID) }}

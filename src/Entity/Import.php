@@ -30,7 +30,7 @@ class Import
 
     /**
      * @var string|null
-     * @Assert\NotBlank
+     * @Assert\NotBlank(message = "Auriez-vous oublié les données à importer ?")
      */
     private $csv;
 
@@ -78,13 +78,13 @@ class Import
      */
     public function getCsv(): ?string
     {
-        return $this->csv;
+        return str_replace(';', ',', $this->csv);
     }
 
     /**
-     * @param string $csv
+     * @param string|null $csv
      */
-    public function setCsv(string $csv): void
+    public function setCsv(?string $csv): void
     {
         $this->csv = $csv;
     }
