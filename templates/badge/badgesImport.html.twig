@@ -1,7 +1,19 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1 class="mb-4">Import de Badges</h1>
+    <h1 class="mb-4">Importer une liste</h1>
+
+    <div class="alert alert-primary mb-4" role="alert">
+        <p>
+            Cette page vous permet d'importer des badges par lot.
+            Seuls les éléments valides seront importés, tous les badges de la liste ne disposant pas des informations attendues (soit incomplètes, soit erronnées) seront ignorés.
+        </p>
+        <p class="mb-0">Le format attendu est le CSV (séparateur virgule ou point-virgule), les champs avec étoile sont obligatoires :</p>
+        <p><code>nom*,prenom*,pseudo,societe,fonction,mail*</code></p>
+
+        <p class="mb-0">Une page de vérification sera présentée avant la génération des badges.</p>
+    </div>
+
     {{ form_start(importForm, {'attr': {'novalidate': 'novalidate'}}) }}
     <div class="row mb-5">
         <div class="d-none">

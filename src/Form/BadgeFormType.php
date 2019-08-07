@@ -65,7 +65,7 @@ class BadgeFormType extends AbstractType
             ])
             ->add('societe', TextType::class, [
                 'label' => "Société",
-                'help' => "Obligatoire",
+                'help' => "Optionnel, mais recommandé",
             ])
             ->add('fonction', TextType::class, [
                 'help' => "Optionnel",

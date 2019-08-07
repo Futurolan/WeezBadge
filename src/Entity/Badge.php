@@ -29,22 +29,22 @@ class Badge
 
     /**
      * @var string|null
-     * @Assert\NotBlank
-     * @Assert\Email
+     * @Assert\NotBlank(message="L'adresse email ne peut être vide.")
+     * @Assert\Email(message="L'adresse email est invalide.")
      * @Serializer\Type("string")
      */
     private $email;
 
     /**
      * @var string|null
-     * @Assert\NotBlank
+     * @Assert\NotBlank(message="Le nom ne peut être vide.")
      * @Serializer\Type("string")
      */
     private $nom;
 
     /**
      * @var string|null
-     * @Assert\NotBlank
+     * @Assert\NotBlank(message="Le prénom ne peut être vide.")
      * @Serializer\Type("string")
      */
     private $prenom;
@@ -57,7 +57,6 @@ class Badge
 
     /**
      * @var string|null
-     * @Assert\NotBlank
      * @Serializer\Type("string")
      */
     private $societe;

@@ -2,6 +2,7 @@
 
 {% block body %}
     <h1>{{ eventTickets.name }}</h1>
+    <div class="alert alert-danger d-none js-alert-box" role="alert"></div>
     <ul class="list-group">
         {% for category in eventTickets.categories %}
             <a class="list-group-item list-group-item-action list-group-item-primary d-flex align-content-center" data-toggle="collapse" href="#collapseCategory_{{ category.id }}" role="button" aria-expanded="false" aria-controls="collapseCategory_{{ category.id }}">
@@ -65,7 +66,7 @@
                             .attr('title', "Catégorie par défaut");
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        console.log(textStatus, errorThrown);
+                        $('.js-alert-box').removeClass('d-none').html( errorThrown + ( jqXHR.responseText !== undefined ? ': '+jqXHR.responseText : '' ));
                     }
                 });
             });

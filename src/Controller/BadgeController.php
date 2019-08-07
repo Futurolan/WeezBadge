@@ -107,12 +107,12 @@ class BadgeController extends AbstractController
         if ( $form->isSubmitted() && $form->isValid() ) {
             /** @var Badge $badge */
             $import = $form->getData();
-            $badges = $this->importToBadges($import);
+            $data = $this->importToBadges($import);
             return $this->render('badge/badgesConfirm.html.twig', [
-                'badges' => $badges,
+                'data' => $data,
                 'eventID' => $import->getEventID(),
                 'ticketID' => $import->getTicketID(),
-                'json' => $this->serializer->serialize($badges, 'json'),
+                'json' => $this->serializer->serialize($data['badges'], 'json'),
             ]);
         }
 
@@ -148,7 +148,10 @@ class BadgeController extends AbstractController
      */
     private function importToBadges(Import $import)
     {
-        $badges = [];
+        $response = [
+            'badges' => [],
+            'errors' => [],
+        ];
 
         $reader = Reader::createFromString($import->getCsv());
         $records = $reader->getRecords(['nom', 'prenom', 'pseudo', 'societe', 'fonction', 'email']);
@@ -157,22 +160,28 @@ class BadgeController extends AbstractController
                 $badge = new Badge();
                 $badge->setEventID($import->getEventID());
                 $badge->setTicketID($import->getTicketID());
-                $badge->setNom($record['nom']);
-                $badge->setPrenom($record['prenom']);
-                $badge->setPseudo($record['pseudo']);
-                $badge->setSociete($record['societe']);
-                $badge->setFonction($record['fonction']);
-                $badge->setEmail($record['email']);
+                $badge->setNom(trim($record['nom']));
+                $badge->setPrenom(trim($record['prenom']));
+                $badge->setPseudo(trim($record['pseudo']));
+                $badge->setSociete(trim($record['societe']));
+                $badge->setFonction(trim($record['fonction']));
+                $badge->setEmail(trim($record['email']));
                 $badge->setNotify($import->getNotify());
                 $errors = $this->validator->validate($badge);
 
                 if ( count($errors) === 0 ) {
-                    $badges[] = $badge;
+                    $response['badges'][] = $badge;
+                } else {
+                    $record = array_map('trim', $record);
+                    $response['errors'][] = [
+                        'badge' => implode(',', $record),
+                        'message' => $errors->get(0)->getMessage(),
+                    ];
                 }
             }
         }
 
-        return $badges;
+        return $response;
     }
 
     /**

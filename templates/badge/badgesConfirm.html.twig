@@ -3,32 +3,52 @@
 {% block body %}
     <h1 class="mb-4">Import de Badges - Confirmation</h1>
 
-    <div class="alert alert-primary mb-5" role="alert">
-        Voici la liste des badges qui vont être créés.
-    </div>
+    {% if data.errors is not empty %}
+        <div class="alert alert-danger" role="alert">
+            <i class="fas fa-exclamation-triangle mr-1"></i>
+            Attention, {{ data.errors|length }} badge{% if data.errors|length > 1 %}s ont été ignorés{% else %} a été ignoré{% endif %} pour cause d'erreurs :
+            <ul class="mb-0">
+                {% for error in data.errors %}
+                    <li>{{ error.badge }}: {{ error.message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
 
-    <div class="row">
-        {% for badge in badges %}
-            <div class="col-xs-12 col-sm-6 col-lg-4 col-xl-3 mb-2">
-                <div class="card border-dark mb-3 mx-4 mx-sm-3 mx-md-0 text-center">
-                    <div class="card-header text-white bg-primary">
-                        <h4 class="mb-0">{{ badge.prenom }}{% if badge.pseudo is not empty %} "{{ badge.pseudo }}"{% endif %} {{ badge.nom|upper }}</h4>
-                    </div>
-                    <div class="card-body ">
-                        <h4>{{ badge.societe }}</h4>
-                        <h5 class="mb-0">{{ badge.fonction }}</h5>
-                    </div>
-                    <div class="card-footer text-muted">
-                        <p class="card-subtitle">{{ badge.email }}</p>
+    {% if data.badges|length > 0 %}
+        <div class="alert alert-primary mb-3" role="alert">
+            {% if data.badges|length > 1 %}
+                Voici la liste des {{ data.badges|length }} badges qui vont être créés.
+            {% else %}
+                Voici le badge qui va être créé.
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% for badge in data.badges %}
+                <div class="col-xs-12 col-sm-6 col-lg-4 col-xl-3 mb-2">
+                    <div class="card border-dark mb-3 mx-4 mx-sm-3 mx-md-0 text-center">
+                        <div class="card-header text-white bg-primary">
+                            <h4 class="mb-0">{{ badge.prenom }}{% if badge.pseudo is not empty %} "{{ badge.pseudo }}"{% endif %} {{ badge.nom|upper }}</h4>
+                        </div>
+                        <div class="card-body ">
+                            <h4>{{ badge.societe }}</h4>
+                            <h5 class="mb-0">{{ badge.fonction }}</h5>
+                        </div>
+                        <div class="card-footer text-muted">
+                            <p class="card-subtitle">{{ badge.email }}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% endfor %}
-    </div>
+            {% endfor %}
+        </div>
 
-    <div class="alert alert-danger d-none js-alert-box" role="alert"></div>
+        <div class="alert alert-danger d-none js-alert-box" role="alert"></div>
 
-    <button type="submit" class="btn btn-primary my-3 js-import-btn">Créer les badges</button>
+        <button type="submit" class="btn btn-primary my-3 js-import-btn">Créer les badges</button>
+    {% else %}
+        <a href="javascript:history.back()" class="btn btn-primary my-3">Retour</a>
+    {% endif %}
 {% endblock %}
 
 {% block javascripts %}
