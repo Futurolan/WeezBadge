@@ -5,15 +5,19 @@ namespace App\Controller;
 
 use App\Entity\Badge;
 use App\Entity\Import;
+use App\Entity\Log;
 use App\Form\BadgeFormType;
 use App\Form\ImportFormType;
 use App\Service\ParameterService;
+use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Futurolan\WeezeventBundle\Client\WeezeventClient;
 use Futurolan\WeezeventBundle\Entity\ParticipantForm;
 use Futurolan\WeezeventBundle\Entity\ParticipantPost;
 use JMS\Serializer\SerializerInterface;
 use League\Csv\Reader;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -39,15 +43,20 @@ class BadgeController extends AbstractController
     /** @var ValidatorInterface */
     private $validator;
 
+    /** @var EntityManagerInterface */
+    private $em;
+
     /**
      * createBadgeController constructor.
      * @param SerializerInterface $serializer
      * @param WeezeventClient $weezeventClient
      * @param ParameterService $parameterService
      * @param ValidatorInterface $validator
+     * @param EntityManagerInterface $em
      */
-    public function __construct(SerializerInterface $serializer, WeezeventClient $weezeventClient, ParameterService $parameterService, ValidatorInterface $validator)
+    public function __construct(SerializerInterface $serializer, WeezeventClient $weezeventClient, ParameterService $parameterService, ValidatorInterface $validator, EntityManagerInterface $em)
     {
+        $this->em = $em;
         $this->serializer = $serializer;
         $this->weezeventClient = $weezeventClient;
         $this->parameterService = $parameterService;
@@ -64,8 +73,23 @@ class BadgeController extends AbstractController
      */
     public function deleteParticipant(string $eventID, string $ticketID, string $participantID)
     {
-        $this->weezeventClient->deleteParticipant($eventID, $participantID);
-        $this->addFlash('success', "Badge supprimé avec succès !");
+        $log = $this->em->getRepository(Log::class)->findOneBy(['participantID' => (int)$participantID]);
+        try{
+            $this->weezeventClient->deleteParticipant($eventID, $participantID);
+            if ( $log instanceof Log) {
+                $log->setDeletedID($this->getUser()->getId());
+                $log->setDeletedEmail($this->getUser()->getEmail());
+                $log->setDeletedName($this->getUser()->getName());
+                $log->setDeletedDate(new \DateTime());
+                $this->em->persist($log);
+                $this->em->flush();
+            }
+
+            $this->addFlash('success', "Badge supprimé avec succès !");
+        } catch(Exception $e) {
+            $this->addFlash('error', "Une erreur est survenue lors de la suppression du badge : ".$e->getMessage());
+        }
+
         return $this->redirectToRoute('eventParticipantsByTicketPage', ['eventID' => $eventID, 'ticketID' => $ticketID]);
     }
 
@@ -83,7 +107,27 @@ class BadgeController extends AbstractController
         if ( $form->isSubmitted() && $form->isValid() ) {
             /** @var Badge $badge */
             $badge = $form->getData();
-            $this->weezeventClient->addParticipant($this->badge2ParticipantForm($badge));
+
+            try {
+                $response = $this->weezeventClient->addParticipant($this->badge2ParticipantForm($badge));
+                if ( !key_exists('total_added', $response) || $response['total_added'] !== 1 ) {
+                    return $this->creationError($form, "Erreur Weezevent");
+                } else {
+                    $log = new Log();
+                    $log->setCreatedID($this->getUser()->getId());
+                    $log->setCreatedEmail($this->getUser()->getEmail());
+                    $log->setCreatedName($this->getUser()->getName());
+                    $log->setEventID($badge->getEventID());
+                    $log->setTicketID($badge->getTicketID());
+                    $log->setParticipantID($response['participants'][0]['id_participant']);
+                    $log->setHash($badge->getHash());
+
+                    $this->em->persist($log);
+                    $this->em->flush();
+                }
+            } catch(Exception $e) {
+                return $this->creationError($form, $e->getMessage());
+            }
 
             $this->addFlash('success', "Badge créé avec succès !");
             return $this->redirectToRoute('eventParticipantsByTicketPage', ['eventID' => $badge->getEventID(), 'ticketID' => $badge->getTicketID()]);
@@ -93,6 +137,21 @@ class BadgeController extends AbstractController
             'badgeForm' => $form->createView(),
         ]);
     }
+
+    /**
+     * @param FormInterface $form
+     * @param string $errorMsg
+     * @return Response
+     */
+    private function creationError(FormInterface $form, string $errorMsg)
+    {
+        $this->addFlash('error', "Erreur lors de la création du badge : ".$errorMsg);
+
+        return $this->render('badge/badgeForm.html.twig', [
+            'badgeForm' => $form->createView(),
+        ]);
+    }
+
 
     /**
      * @Route("/badge/import", name="importBadgesPage")
@@ -135,7 +194,7 @@ class BadgeController extends AbstractController
 
         try{
             $this->weezeventClient->addParticipants($participants);
-        } catch(\Exception $e) {
+        } catch(Exception $e) {
             return new Response($e->getMessage(), 500);
         }
 

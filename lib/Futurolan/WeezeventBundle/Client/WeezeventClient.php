@@ -149,7 +149,7 @@ class WeezeventClient
 
     /**
      * @param ParticipantPost $participant
-     * @return bool
+     * @return array
      * @throws GuzzleException
      */
     public function addParticipant(ParticipantPost $participant)
@@ -161,7 +161,7 @@ class WeezeventClient
      * Add an array of ParticipantPost to Weezevent
      *
      * @param ParticipantPost[] $participants
-     * @return bool
+     * @return array
      * @throws GuzzleException
      */
     public function addParticipants(array $participants)
@@ -175,10 +175,7 @@ class WeezeventClient
             ]
         );
         $responseArray = $this->serializer->deserialize($response->getBody(), 'array', 'json');
-        if ( key_exists('total_added', $responseArray) && $responseArray['total_added'] === 1 ) {
-            return true;
-        }
-        return false;
+        return $responseArray;
     }
 
     /**

@@ -34,6 +34,7 @@ class ParameterService
     public function get(string $name)
     {
         $param = $this->em->getRepository(Parameter::class)->findOneBy(['name' => $name]);
+        if ( !$param instanceof Parameter) { return null; }
         return $param->getValue();
     }
 

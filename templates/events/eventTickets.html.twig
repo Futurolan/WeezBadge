@@ -7,7 +7,7 @@
         {% for category in eventTickets.categories %}
             <a class="list-group-item list-group-item-action list-group-item-primary d-flex align-content-center" data-toggle="collapse" href="#collapseCategory_{{ category.id }}" role="button" aria-expanded="false" aria-controls="collapseCategory_{{ category.id }}">
                 <h5 class="my-2">{{ category.name }}</h5>
-                {% if DefaultCategory.eventID == eventTickets.id and DefaultCategory.categoryID == category.id %}
+                {% if DefaultCategory is not null and DefaultCategory.eventID == eventTickets.id and DefaultCategory.categoryID == category.id %}
                     <button type="button" data-eventID="{{ eventTickets.id }}" data-categoryID="{{ category.id }}"
                             class="js_default_event_btn btn btn-success ml-auto"
                             title="Catégorie par défaut">

@@ -218,4 +218,20 @@ class Badge
     {
         $this->pseudo = $pseudo;
     }
+
+    /**
+     * @return string
+     */
+    public function getHash()
+    {
+        $badge = [
+            $this->getEventID(),
+            $this->getNom(),
+            $this->getPrenom(),
+            $this->getEmail()
+        ];
+        $badge = array_map('trim', $badge);
+        $badge = array_map('strtolower', $badge);
+        return hash('sha256', implode(',', $badge));
+    }
 }

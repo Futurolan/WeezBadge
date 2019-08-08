@@ -1,4 +1,4 @@
-{% if is_granted('ROLE_USER') %}
+{% if is_granted('ROLE_USER') and eventID is not empty %}
     <li class="nav-item">
         <a class="nav-link" href="{{ path('newBadgePage') }}">
             <i class="fas fa-plus-circle"></i>
