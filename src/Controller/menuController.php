@@ -5,8 +5,9 @@ namespace App\Controller;
 
 
 use App\Service\ParameterService;
-use Futurolan\WeezeventBundle\Client\WeezeventClient;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+use GuzzleHttp\Exception\GuzzleException;
 
 /**
  * Class menuController
@@ -14,14 +15,27 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class menuController extends AbstractController
 {
-    public function dynamicMenu(ParameterService $parameterService, WeezeventClient $weezeventClient)
+    /** @var BadgeController */
+    private $badgeController;
+
+    /**
+     * createBadgeController constructor.
+     * @param BadgeController $badgeController
+     */
+    public function __construct(BadgeController $badgeController)
+    {
+        $this->badgeController = $badgeController;
+    }
+
+    /**
+     * @param ParameterService $parameterService
+     * @return Response
+     * @throws GuzzleException
+     */
+    public function dynamicMenu(ParameterService $parameterService)
     {
         $defaultCategory = $parameterService->get($parameterService::DEFAULT_CATEGORY_NAME);
-        if ( !empty($defaultCategory['eventID']) && !empty($defaultCategory['eventID']) && $this->isGranted('ROLE_USER') ) {
-            $tickets = $weezeventClient->getCategory($defaultCategory['eventID'], $defaultCategory['categoryID']);
-        } else {
-            $tickets = [];
-        }
+        $tickets = $this->badgeController->getAllowedTickets();
 
         return $this->render("menu/menu.html.twig", [
             'tickets' => $tickets,

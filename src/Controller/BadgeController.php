@@ -13,9 +13,9 @@ use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Futurolan\WeezeventBundle\Client\WeezeventClient;
-use Futurolan\WeezeventBundle\Entity\Category;
 use Futurolan\WeezeventBundle\Entity\ParticipantForm;
 use Futurolan\WeezeventBundle\Entity\ParticipantPost;
+use Futurolan\WeezeventBundle\Entity\Ticket;
 use JMS\Serializer\SerializerInterface;
 use League\Csv\Reader;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -262,10 +262,10 @@ class BadgeController extends AbstractController
     }
 
     /**
-     * @return Category[]
+     * @return Ticket[]
      * @throws GuzzleException
      */
-    public function getAllowedCategories()
+    public function getAllowedTickets()
     {
         $res = [];
         try{
