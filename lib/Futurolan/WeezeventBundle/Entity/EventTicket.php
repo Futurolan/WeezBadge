@@ -24,7 +24,7 @@ class EventTicket
     private $name;
 
     /**
-     * @var Category[]
+     * @var null|Category[]
      * @Serializer\Type("array<Futurolan\WeezeventBundle\Entity\Category>")
      */
     private $categories;
@@ -48,7 +48,7 @@ class EventTicket
     /**
      * @return Category[]
      */
-    public function getCategories(): array
+    public function getCategories(): ?array
     {
         return $this->categories;
     }

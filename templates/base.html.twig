@@ -16,7 +16,7 @@
         </style>
         {% block stylesheets %}{% endblock %}
     </head>
-    <body class="vh-100">
+    <body class="d-flex flex-column min-vh-100">
         <div class="container-fluid d-flex h-100 px-0">
             <main class="d-flex flex-column px-0 w-100" role="main">
                 <nav class="navbar navbar-dark bg-primary navbar-expand-lg">
@@ -71,6 +71,11 @@
                 </div>
             </main>
         </div>
+        <footer class="footer mt-auto">
+            <div class="container-fluid text-center">
+                <span class="text-muted">{{ footer_text }}</span>
+            </div>
+        </footer>
 
         <script>
             $(function () {

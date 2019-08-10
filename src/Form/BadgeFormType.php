@@ -44,7 +44,7 @@ class BadgeFormType extends AbstractType
             ])
             ->add('ticketID', ChoiceType::class, [
                 'label' => "Catégorie de badge",
-                'choices' => $this->badgeController->getAllowedTickets(),
+                'choices' => $this->badgeController->getAllowedTicketsForm(),
                 'help' => "Obligatoire, détermine le niveau d'accès",
             ])
             ->add('prenom', TextType::class, [

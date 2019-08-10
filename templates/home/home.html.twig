@@ -1,7 +1,10 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>WeezBadge</h1>
+    <h1 class="mb-4">{{ defaultEvent.name }}</h1>
 
-
+    <p>
+        Bienvenue sur l'application de gestion de badges pour l'événement {{ defaultEvent.name|title }}.
+        Cette application vous permet de créer, importer ou supprimer des badges.
+    </p>
 {% endblock %}

@@ -1,36 +1,42 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>{{ ticket.name }} ({{ ticket.participants }})</h1>
-    <div class="row mt-4">
-        {% for participant in participants %}
-            <div class="col-xs-12 col-sm-6 col-lg-4 col-xl-3 mb-2">
-                <div class="card border-dark mb-3 mx-4 mx-sm-3 mx-md-0">
-                    <div class="card-header text-white bg-primary">
-                        <div class="d-flex align-items-center">
-                            <div class="mr-auto">{{ participant.owner.firstName }} {{ participant.owner.lastName|upper }}</div>
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-success" title="Télécharger le badge">
-                                    <i class="far fa-id-badge fa-lg"></i>
-                                </button>
-                                <a href="{{ path('deleteParticipant', {'eventID': participant.idEvent, 'ticketID': ticket.id, 'participantID': participant.idParticipant}) }}" type="button" class="btn btn-danger" title="Supprimer le badge">
-                                    <i class="far fa-trash-alt fa-lg"></i>
-                                </a>
+    <h1 class="mb-4">{{ ticket.name|title }} ({{ ticket.participants }})</h1>
+    {% if participants|length > 0 %}
+        <div class="row mt-4">
+            {% for participant in participants %}
+                <div class="col-xs-12 col-sm-6 col-lg-4 col-xl-3 mb-2">
+                    <div class="card border-dark mb-3 mx-4 mx-sm-3 mx-md-0">
+                        <div class="card-header text-white bg-primary">
+                            <div class="d-flex align-items-center">
+                                <div class="mr-auto">{{ participant.owner.firstName }} {{ participant.owner.lastName|upper }}</div>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-success" title="Télécharger le badge">
+                                        <i class="far fa-id-badge fa-lg"></i>
+                                    </button>
+                                    <a href="{{ path('deleteParticipant', {'eventID': participant.idEvent, 'ticketID': ticket.id, 'participantID': participant.idParticipant}) }}" type="button" class="btn btn-danger" title="Supprimer le badge">
+                                        <i class="far fa-trash-alt fa-lg"></i>
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="card-body">
-                    {% for answer in participant.answers %}
-                        {% if answer.value|lower != participant.owner.firstName|lower and answer.value|lower != participant.owner.lastName|lower %}
-                            <p class="card-subtitle">{{ answer.label }}: {{ answer.value }}</p>
-                        {% endif %}
-                    {% endfor %}
-                    </div>
-                    <div class="card-footer text-muted">
-                        <p class="card-subtitle small">{{ participant.idParticipant }} - {{ participant.createDate|date('d/m/Y H:i:s') }}</p>
+                        <div class="card-body">
+                        {% for answer in participant.answers %}
+                            {% if answer.value|lower != participant.owner.firstName|lower and answer.value|lower != participant.owner.lastName|lower %}
+                                <p class="card-subtitle">{{ answer.label }}: {{ answer.value }}</p>
+                            {% endif %}
+                        {% endfor %}
+                        </div>
+                        <div class="card-footer text-muted">
+                            <p class="card-subtitle small">{{ participant.idParticipant }} - {{ participant.createDate|date('d/m/Y H:i:s') }}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% endfor %}
-    </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-primary mt-4" role="alert">
+            Il n'y a aucun badge dans cette catégorie.
+        </div>
+    {% endif %}
 {% endblock %}

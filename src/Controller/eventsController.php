@@ -72,16 +72,4 @@ class eventsController extends AbstractController
         ]);
     }
 
-//    /**
-//     * @Route("/event/{eventID}", name="eventPage")
-//     * @param string $eventID
-//     * @return Response
-//     * @throws GuzzleException
-//     */
-//    public function eventParticipantsAction(string $eventID)
-//    {
-//        return $this->render("events/eventParticipants.html.twig", [
-//            'participants' => $this->weezeventClient->getParticipantsByEvent($eventID),
-//        ]);
-//    }
 }

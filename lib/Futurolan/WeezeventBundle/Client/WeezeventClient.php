@@ -71,6 +71,22 @@ class WeezeventClient
 
     /**
      * @param string $eventId
+     * @return Event|null
+     * @throws GuzzleException
+     */
+    public function getEvent(string $eventId)
+    {
+        $events = $this->getEvents(true);
+        foreach ($events as $event) {
+            if ( $event->getId() === (int)$eventId ) {
+                return $event;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param string $eventId
      * @return Participant[]
      * @throws GuzzleException
      */

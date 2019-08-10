@@ -9,9 +9,11 @@ use App\Entity\Log;
 use App\Form\BadgeFormType;
 use App\Form\ImportFormType;
 use App\Service\ParameterService;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Futurolan\WeezeventBundle\Client\WeezeventClient;
+use Futurolan\WeezeventBundle\Entity\Category;
 use Futurolan\WeezeventBundle\Entity\ParticipantForm;
 use Futurolan\WeezeventBundle\Entity\ParticipantPost;
 use JMS\Serializer\SerializerInterface;
@@ -80,7 +82,7 @@ class BadgeController extends AbstractController
                 $log->setDeletedID($this->getUser()->getId());
                 $log->setDeletedEmail($this->getUser()->getEmail());
                 $log->setDeletedName($this->getUser()->getName());
-                $log->setDeletedDate(new \DateTime());
+                $log->setDeletedDate(new DateTime());
                 $this->em->persist($log);
                 $this->em->flush();
             }
@@ -260,10 +262,31 @@ class BadgeController extends AbstractController
     }
 
     /**
+     * @return Category[]
+     * @throws GuzzleException
+     */
+    public function getAllowedCategories()
+    {
+        $res = [];
+        try{
+            $defaultCategory = $this->parameterService->get($this->parameterService::DEFAULT_CATEGORY_NAME);
+            if ( empty($defaultCategory['eventID']) || empty($defaultCategory['eventID']) ) { return $res; }
+            $tickets = $this->weezeventClient->getCategory($defaultCategory['eventID'], $defaultCategory['categoryID']);
+        } catch(Exception $e) {
+            return [];
+        }
+
+        foreach ($tickets as $ticket) {
+            $res[] = $ticket;
+        }
+        return $res;
+    }
+
+    /**
      * @return array
      * @throws GuzzleException
      */
-    public function getAllowedTickets()
+    public function getAllowedTicketsForm()
     {
         $res = ['' => ''];
         $defaultCategory = $this->parameterService->get($this->parameterService::DEFAULT_CATEGORY_NAME);
