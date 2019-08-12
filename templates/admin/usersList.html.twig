@@ -2,9 +2,9 @@
 
 {% block body %}
     <div class="float-right">
-        <a class="btn btn-primary mb-2" href="{{ path('adminNewUserPage') }}" role="button">Add User</a>
+        <a class="btn btn-primary mb-2" href="{{ path('adminNewUserPage') }}" role="button">Ajouter</a>
     </div>
-    <h1>Users</h1>
+    <h1 class="mb-4">Utilisateurs</h1>
     <div class="row mt-4">
         {% for user in users %}
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-2">
@@ -30,7 +30,10 @@
                         {% endif %}
                     </div>
                     <div class="card-footer text-right">
-                        <a href="{{ path('adminEditUserPage', {'id': user.id}) }}" class="btn btn-primary">Edit</a>
+                        {% if 'ROLE_SUPER_ADMIN' not in user.roles and 'ROLE_ADMIN' not in user.roles %}
+                            <a href="{{ path('adminUserAclPage', {'id': user.id}) }}" class="btn btn-primary">Droits d'accès</a>
+                        {% endif %}
+                        <a href="{{ path('adminEditUserPage', {'id': user.id}) }}" class="btn btn-primary">Édition</a>
                     </div>
                 </div>
             </div>

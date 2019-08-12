@@ -1,7 +1,7 @@
 {{ form_start(userForm) }}
     {{ form_row(userForm.name) }}
     {{ form_row(userForm.email) }}
-    {{ form_row(userForm.roles, {label: 'Role'}) }}
+    {{ form_row(userForm.roles) }}
 
     <button type="submit" class="btn btn-primary" formnovalidate>{{button_text}}</button>
 {{ form_end(userForm) }}

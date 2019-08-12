@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1 class="mb-4">Droits d'accès</h1>
+    <h3>Utilisateur : {{ user.name }}</h3>
+    {{ form_start(aclForm) }}
+        {{ form_row(aclForm.allowedTickets) }}
+
+        <button type="submit" class="btn btn-primary" formnovalidate>Valider</button>
+    {{ form_end(aclForm) }}
+{% endblock %}

@@ -25,5 +25,9 @@
                 </div>
             {% endfor %}
         </div>
+    {% else %}
+        <div class="alert alert-primary mt-4" role="alert">
+            Vous n'avez accès à aucune catégorie de badges pour l'événement en cours, veuillez vous rapprocher de votre contact pour obtenir les droits dont vous avez besoin.
+        </div>
     {% endif %}
 {% endblock %}

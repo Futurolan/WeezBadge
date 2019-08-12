@@ -220,6 +220,28 @@ class WeezeventClient
     }
 
     /**
+     * @param string $eventId
+     * @param string $participantId
+     * @throws GuzzleException
+     * @return string|null
+     */
+    public function getBadgeUrl(string $eventId, string $participantId)
+    {
+        $this->client = new Client();
+        $data = $this->serializer->serialize(['participants' => [['id_evenement' => (int)$eventId, 'id_participant' => $participantId]], 'return_ticket_url' => true], 'json');
+        $response = $this->client->request('PATCH', $this->buildQuery($this->apiUrl.Constants::PARTICIPANTS_PATH, []),
+            [
+                'form_params' => array('data' => $data)
+            ]
+        );
+        $responseArray = $this->serializer->deserialize($response->getBody(), 'array', 'json');
+        if ( key_exists('participants', $responseArray) && count($responseArray['participants']) === 1 && key_exists('ticket_url', $responseArray['participants'][0]) ) {
+            return $responseArray['participants'][0]['ticket_url'];
+        }
+        return null;
+    }
+
+    /**
      * @param string $url
      * @param array $params
      * @return string

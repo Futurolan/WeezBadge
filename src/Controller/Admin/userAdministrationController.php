@@ -4,7 +4,10 @@
 namespace App\Controller\Admin;
 
 
+use App\Controller\BadgeController;
+use App\Entity\Acl;
 use App\Entity\User;
+use App\Form\UserAclFormType;
 use App\Form\UserFormType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,13 +29,18 @@ class userAdministrationController extends AbstractController
     /** @var EntityManagerInterface */
     private $em;
 
+    /** @var BadgeController */
+    private $badgeController;
+
     /**
      * userAdministrationController constructor.
      * @param EntityManagerInterface $em
+     * @param BadgeController $badgeController
      */
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $em, BadgeController $badgeController)
     {
         $this->em = $em;
+        $this->badgeController = $badgeController;
     }
 
     /**
@@ -46,6 +54,7 @@ class userAdministrationController extends AbstractController
             'users' => $repository->findAll(),
         ]);
     }
+
 
     /**
      * @Route("/admin/user/new", name="adminNewUserPage")
@@ -64,12 +73,12 @@ class userAdministrationController extends AbstractController
             $this->em->persist($user);
             $this->em->flush();
 
-            $this->addFlash('success', "User ".$user->getEmail()." created successfully !");
+            $this->addFlash('success', "L'utilisateur ".$user->getEmail()." a été créé avec succès !");
 
             return $this->redirectToRoute('adminUsersListPage');
         }
 
-        return $this->render('admin/newUserForm.html.twig', [
+        return $this->render('admin/newUser.html.twig', [
             'userForm' => $form->createView(),
         ]);
     }
@@ -90,13 +99,46 @@ class userAdministrationController extends AbstractController
             $this->em->persist($user);
             $this->em->flush();
 
-            $this->addFlash('success', "User ".$user->getEmail()." edited successfully !");
+            $this->addFlash('success', "L'utilisateur ".$user->getEmail()." a été édité avec succès !");
 
             return $this->redirectToRoute('adminUsersListPage');
         }
 
-        return $this->render('admin/editUserForm.html.twig', [
+        return $this->render('admin/editUser.html.twig', [
             'userForm' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/admin/user/{id}/acl", name="adminUserAclPage")
+     * @param User $user
+     * @param Request $request
+     * @return RedirectResponse|Response
+     */
+    public function editAcl(User $user, Request $request)
+    {
+
+        $acl = new Acl();
+        $acl->setEventId($this->badgeController->getDefaultEventId());
+        $acl->rolesToAcl($user->getRoles());
+
+        $form = $this->createForm(UserAclFormType::class, $acl);
+
+        $form->handleRequest($request);
+        if ( $form->isSubmitted() && $form->isValid() ) {
+            if ( !in_array('ROLE_SUPER_ADMIN', $user->getRoles()) && !in_array('ROLE_ADMIN', $user->getRoles()) ) {
+                $user->setRoles(array_merge(['ROLE_USER'], $acl->aclToRoles()));
+                $this->em->persist($user);
+                $this->em->flush();
+
+                $this->addFlash('success', "Les droits ".$user->getEmail()." ont été édités avec succès !");
+                return $this->redirectToRoute('adminUsersListPage');
+            }
+        }
+
+        return $this->render("admin/editUserAcl.html.twig", [
+            'user' => $user,
+            'aclForm' => $form->createView(),
         ]);
     }
 }

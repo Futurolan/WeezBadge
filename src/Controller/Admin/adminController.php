@@ -28,7 +28,7 @@ class adminController extends AbstractController
 
         if ( $this->isGranted('ROLE_ADMIN') ) {
             $modules[] = [
-                'name' => "Events",
+                'name' => "Événements",
                 'route' => 'eventsListPage',
                 'icon' => 'far fa-calendar-alt',
             ];
@@ -36,7 +36,7 @@ class adminController extends AbstractController
 
         if ( $this->isGranted('ROLE_SUPER_ADMIN') ) {
             $modules[] = [
-                'name' => "Users",
+                'name' => "Utilisateurs",
                 'route' => 'adminUsersListPage',
                 'icon' => 'fas fa-users-cog',
             ];

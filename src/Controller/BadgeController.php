@@ -18,12 +18,14 @@ use Futurolan\WeezeventBundle\Entity\ParticipantPost;
 use Futurolan\WeezeventBundle\Entity\Ticket;
 use JMS\Serializer\SerializerInterface;
 use League\Csv\Reader;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use GuzzleHttp\Exception\GuzzleException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -75,6 +77,10 @@ class BadgeController extends AbstractController
      */
     public function deleteParticipant(string $eventID, string $ticketID, string $participantID)
     {
+        if ( !$this->isGranted('ROLE_'.$eventID.'_'.$ticketID) && !$this->isGranted('ROLE_ADMIN') ) {
+            throw new AccessDeniedException("Vous n'avez pas le droit de gérer cette catégorie de badge.");
+        }
+
         $log = $this->em->getRepository(Log::class)->findOneBy(['participantID' => (int)$participantID]);
         try{
             $this->weezeventClient->deleteParticipant($eventID, $participantID);
@@ -96,6 +102,30 @@ class BadgeController extends AbstractController
     }
 
     /**
+     * @Route("/event/{eventID}/ticket/{ticketID}/pdf/{participantID}", methods={"GET"}, name="getPdfBadge")
+     * @param string $eventID
+     * @param string $ticketID
+     * @param string $participantID
+     * @return Response
+     * @throws GuzzleException
+     */
+    public function getPdfBadge(string $eventID, string $ticketID, string $participantID)
+    {
+        if (!$this->isGranted('ROLE_' . $eventID . '_' . $ticketID) && !$this->isGranted('ROLE_ADMIN')) {
+            throw new AccessDeniedException("Vous n'avez pas le droit de gérer cette catégorie de badge.");
+        }
+
+        try {
+            $badgeUrl = $this->weezeventClient->getBadgeUrl($eventID, $participantID);
+            return $this->redirect($badgeUrl);
+        } catch(Exception $e) {
+            $this->addFlash('error', "Une erreur est survenue lors du téléchargement du badge en pdf : ".$e->getMessage());
+        }
+
+        return $this->redirectToRoute('eventParticipantsByTicketPage', ['eventID' => $eventID, 'ticketID' => $ticketID]);
+    }
+
+    /**
      * @Route("/badge/new", name="newBadgePage")
      * @param Request $request
      * @return Response
@@ -109,6 +139,10 @@ class BadgeController extends AbstractController
         if ( $form->isSubmitted() && $form->isValid() ) {
             /** @var Badge $badge */
             $badge = $form->getData();
+
+            if ( !$this->isGranted('ROLE_'.$badge->getEventID().'_'.$badge->getTicketID()) && !$this->isGranted('ROLE_ADMIN') ) {
+                throw new AccessDeniedException("Vous n'avez pas le droit de gérer cette catégorie de badge.");
+            }
 
             try {
                 $response = $this->weezeventClient->addParticipant($this->badge2ParticipantForm($badge));
@@ -190,9 +224,15 @@ class BadgeController extends AbstractController
      */
     public function confirmImportBadges(Request $request)
     {
+        /** @var Badge[] $badges */
         $badges = $this->serializer->deserialize($request->getContent(), 'array<App\Entity\Badge>', 'json');
         $participants = [];
-        foreach ($badges as $badge) { $participants[] = $this->badge2ParticipantForm($badge); }
+        foreach ($badges as $badge) {
+            if ( !$this->isGranted('ROLE_'.$badge->getEventID().'_'.$badge->getTicketID()) && !$this->isGranted('ROLE_ADMIN') ) {
+                throw new AccessDeniedException("Vous n'avez pas le droit de gérer cette catégorie de badge.");
+            }
+            $participants[] = $this->badge2ParticipantForm($badge);
+        }
 
         try{
             $this->weezeventClient->addParticipants($participants);
@@ -246,6 +286,18 @@ class BadgeController extends AbstractController
     }
 
     /**
+     * @return int|null
+     */
+    public function getDefaultEventId(): ?int
+    {
+        $defaultCategory = $this->parameterService->get($this->parameterService::DEFAULT_CATEGORY_NAME);
+        if ( key_exists('eventID', $defaultCategory) && !empty($defaultCategory['eventID']) ) {
+            return (int)$defaultCategory['eventID'];
+        }
+        return null;
+    }
+
+    /**
      * @return array
      * @throws GuzzleException
      */
@@ -265,19 +317,48 @@ class BadgeController extends AbstractController
      * @return Ticket[]
      * @throws GuzzleException
      */
-    public function getAllowedTickets()
+    private function getTickets()
     {
-        $res = [];
         try{
             $defaultCategory = $this->parameterService->get($this->parameterService::DEFAULT_CATEGORY_NAME);
-            if ( empty($defaultCategory['eventID']) || empty($defaultCategory['eventID']) ) { return $res; }
+            if ( empty($defaultCategory['eventID']) || empty($defaultCategory['eventID']) ) { return []; }
             $tickets = $this->weezeventClient->getCategory($defaultCategory['eventID'], $defaultCategory['categoryID']);
+            return $tickets;
         } catch(Exception $e) {
             return [];
         }
+    }
+
+    /**
+     * @return array
+     * @throws GuzzleException
+     * @Security("is_granted('ROLE_SUPER_ADMIN')")
+     */
+    public function getTicketsForm()
+    {
+        $res = [];
+        $tickets = $this->getTickets();
+        foreach ($tickets as $ticket) {
+            $res[ucwords(strtolower($ticket->getName()))] = (int)$ticket->getId();
+        }
+        ksort($res);
+        return $res;
+    }
+
+    /**
+     * @return Ticket[]
+     * @throws GuzzleException
+     */
+    public function getAllowedTickets()
+    {
+        $res = [];
+        $tickets = $this->getTickets();
+        $defaultCategory = $this->parameterService->get($this->parameterService::DEFAULT_CATEGORY_NAME);
 
         foreach ($tickets as $ticket) {
-            $res[] = $ticket;
+            if ( $this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_'.$defaultCategory['eventID'].'_'.$ticket->getId()) ) {
+                $res[] = $ticket;
+            }
         }
         return $res;
     }
@@ -289,13 +370,12 @@ class BadgeController extends AbstractController
     public function getAllowedTicketsForm()
     {
         $res = ['' => ''];
-        $defaultCategory = $this->parameterService->get($this->parameterService::DEFAULT_CATEGORY_NAME);
-        if ( empty($defaultCategory['eventID']) || empty($defaultCategory['eventID']) ) { return $res; }
-        $tickets = $this->weezeventClient->getCategory($defaultCategory['eventID'], $defaultCategory['categoryID']);
+        $tickets = $this->getAllowedTickets();
 
         foreach ($tickets as $ticket) {
             $res[ucwords(strtolower($ticket->getName()))] = (int)$ticket->getId();
         }
+        ksort($res);
         return $res;
     }
 
@@ -323,4 +403,13 @@ class BadgeController extends AbstractController
         $participant->setForm($form);
         return $participant;
     }
+
+
+//$datas = '{"participants":[{"id_evenement":'.$app['weezevent.id_event'].',"barcode_id":'.$barcode_participant.'}],"return_ticket_url":1}';
+//$ticket = json_decode($guzzle->request('PATCH', 'https://api.weezevent.com/v3/participants?api_key='.$app['weezevent.api_key'].'&access_token='.$app['weezevent.access_token'].'&data='.$datas, array('form_params' => array('data' => $datas), 'headers' => array('Content-type' => 'application/x-www-form-urlencoded', 'Charset' => 'utf-8')))->getBody());
+//$url = $ticket->participants[0]->ticket_url;
+//
+//header('Location: '.$url);
+
+
 }

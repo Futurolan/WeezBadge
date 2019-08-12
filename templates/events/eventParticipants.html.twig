@@ -11,9 +11,9 @@
                             <div class="d-flex align-items-center">
                                 <div class="mr-auto">{{ participant.owner.firstName }} {{ participant.owner.lastName|upper }}</div>
                                 <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-success" title="Télécharger le badge">
+                                    <a href="{{ path('getPdfBadge', {'eventID': participant.idEvent, 'ticketID': ticket.id, 'participantID': participant.idParticipant}) }}" type="button" class="btn btn-success" title="Télécharger le badge">
                                         <i class="far fa-id-badge fa-lg"></i>
-                                    </button>
+                                    </a>
                                     <a href="{{ path('deleteParticipant', {'eventID': participant.idEvent, 'ticketID': ticket.id, 'participantID': participant.idParticipant}) }}" type="button" class="btn btn-danger" title="Supprimer le badge">
                                         <i class="far fa-trash-alt fa-lg"></i>
                                     </a>

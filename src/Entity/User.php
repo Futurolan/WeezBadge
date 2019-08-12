@@ -262,8 +262,6 @@ class User implements UserInterface
         foreach($this->getRoles() as $role) {
             if ( key_exists($role, self::ROLE_MAPPING) ) {
                 $readableRoles[] = self::ROLE_MAPPING[$role];
-            } else {
-                $readableRoles[] = $role;
             }
         }
         return $readableRoles;

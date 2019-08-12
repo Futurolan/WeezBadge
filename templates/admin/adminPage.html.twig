@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Admin</h1>
+    <h1 class="mb-4">Administration</h1>
     <div class="row mt-4">
         {% for module in modules %}
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-2 px-5 text-center">
                 <a href="{{ path( module.route ) }}" class="btn btn-outline-primary mb-3 mx-0 btn-lg btn-block" role="button">
                     <i class="{{ module.icon }} fa-5x"></i>
-                    <h1>{{ module.name }}</h1>
+                    <h3>{{ module.name }}</h3>
                 </a>
             </div>
         {% endfor %}
