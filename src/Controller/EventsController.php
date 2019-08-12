@@ -16,7 +16,7 @@ use GuzzleHttp\Exception\GuzzleException;
  * @package App\Controller
  * @Security("is_granted('ROLE_USER')")
  */
-class eventsController extends AbstractController
+class EventsController extends AbstractController
 {
     /** @var WeezeventClient */
     private $weezeventClient;

@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
  * @package App\Controller\Admin
  * @Security("is_granted('ROLE_ADMIN')")
  */
-class adminController extends AbstractController
+class AdminController extends AbstractController
 {
 
     /**

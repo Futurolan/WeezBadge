@@ -13,7 +13,7 @@ use GuzzleHttp\Exception\GuzzleException;
  * Class menuController
  * @package App\Controller
  */
-class menuController extends AbstractController
+class MenuController extends AbstractController
 {
     /** @var BadgeController */
     private $badgeController;

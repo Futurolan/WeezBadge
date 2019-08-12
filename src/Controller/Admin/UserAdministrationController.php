@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
  * @package App\Controller
  * @Security("is_granted('ROLE_SUPER_ADMIN')")
  */
-class userAdministrationController extends AbstractController
+class UserAdministrationController extends AbstractController
 {
 
     /** @var EntityManagerInterface */

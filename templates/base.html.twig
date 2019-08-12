@@ -30,7 +30,7 @@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav mr-auto">
                         {% block navBarBlock %}
-                            {{ render(controller('App\\Controller\\menuController::dynamicMenu', {})) }}
+                            {{ render(controller('App\\Controller\\MenuController::dynamicMenu', {})) }}
 
                         {% endblock %}
                         {% if is_granted('IS_AUTHENTICATED_FULLY') %}

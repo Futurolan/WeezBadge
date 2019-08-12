@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
  * Class homePageController
  * @package App\Controller
  */
-class homePageController extends AbstractController
+class HomePageController extends AbstractController
 {
     /** @var WeezeventClient */
     private $weezeventClient;
