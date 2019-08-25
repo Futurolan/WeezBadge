@@ -9,15 +9,15 @@ Requirements
 * A [Google Oauth 2.0 API Key](https://developers.google.com/identity/protocols/OAuth2)
 * A Weezevent API Key and Token (contact Weezevent for getting one)
 
-Installation
-------------
+Installation / Update
+---------------------
 
     $ composer create-project futurolan/weezbadge
 
 Configuration
 -------------
 
-Create a file name '.env.local' in project root (weezevent/).
+Create a file name '.env.local' in project root (weezevent/). This file will not be overwrite on update.
 
     # Symfony
     APP_ENV=prod
