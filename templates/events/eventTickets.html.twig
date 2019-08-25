@@ -47,6 +47,7 @@
 {% endblock %}
 
 {% block javascripts %}
+    {{ parent() }}
     <script>
         $(function () {
             $('.js_default_event_btn').on('click', null, function (e) {
