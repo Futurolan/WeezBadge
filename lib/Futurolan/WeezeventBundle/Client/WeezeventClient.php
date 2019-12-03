@@ -111,6 +111,8 @@ class WeezeventClient
      */
     private function getToken()
     {
+        $filesystem = new Filesystem();
+        if ( !$filesystem->exists($this->tokenPath) ) { $this->getNewToken(); }
         return file_get_contents($this->tokenPath);
     }
 
