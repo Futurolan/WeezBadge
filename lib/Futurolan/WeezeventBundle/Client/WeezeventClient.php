@@ -12,8 +12,11 @@ use Futurolan\WeezeventBundle\Entity\ParticipantPost;
 use Futurolan\WeezeventBundle\Entity\Participants;
 use Futurolan\WeezeventBundle\Entity\Ticket;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use JMS\Serializer\Serializer;
+use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Class WeezeventClient
@@ -28,7 +31,13 @@ class WeezeventClient
     private $apiKey;
 
     /** @var string */
-    private $apiToken;
+    private $apiUsername;
+
+    /** @var string */
+    private $apiPassword;
+
+    /** @var string */
+    private $tokenPath = '';
 
     /** @var Client */
     private $client;
@@ -41,14 +50,68 @@ class WeezeventClient
      * @param Serializer $serializer
      * @param string $apiUrl
      * @param string $apiKey
-     * @param string $apiToken
+     * @param string $apiUsername
+     * @param string $apiPassword
      */
-    public function __construct(Serializer $serializer, string $apiUrl, string $apiKey, string $apiToken)
+    public function __construct(Serializer $serializer, string $apiUrl, string $apiKey, string $apiUsername, string $apiPassword)
     {
         $this->apiUrl = $apiUrl;
         $this->apiKey = $apiKey;
-        $this->apiToken = $apiToken;
+        $this->apiUsername = $apiUsername;
+        $this->apiPassword = $apiPassword;
         $this->serializer = $serializer;
+        $this->tokenPath = sys_get_temp_dir().'/weezeventToken';
+    }
+
+    /**
+     * @param string $method
+     * @param string $url
+     * @param array $params
+     * @param array $options
+     * @param bool $newToken
+     * @return mixed|ResponseInterface
+     * @throws GuzzleException
+     */
+    private function request(string $method, string $url, array $params = [], array $options = [], bool $newToken = false)
+    {
+        $this->client = new Client();
+        if ( $newToken ) { $this->getNewToken(); }
+        try{
+            return $this->client->request($method, $this->buildQuery($url, $params), $options);
+        } catch(ClientException $clientException) {
+            if ( $clientException->getCode() === 403 && preg_match('/The access token is invalid/', $clientException->getMessage()) ) {
+                /** Invalid Token */
+                if ( !$newToken ) {
+                    return $this->request($method, $url, $params, $options, true);
+                }
+            }
+            throw $clientException;
+        }
+    }
+
+    private function getNewToken()
+    {
+        $this->client = new Client();
+        $response = $this->client->request('POST', $this->buildTokenQuery());
+        $data = $this->serializer->deserialize($response->getBody(), 'array', 'json');
+        $this->setToken($data['accessToken']);
+    }
+
+    /**
+     * @param string $apiToken
+     */
+    private function setToken(string $apiToken) :void
+    {
+        $filesystem = new Filesystem();
+        $filesystem->dumpFile($this->tokenPath, $apiToken);
+    }
+
+    /**
+     * @return false|string
+     */
+    private function getToken()
+    {
+        return file_get_contents($this->tokenPath);
     }
 
     /**
@@ -59,10 +122,10 @@ class WeezeventClient
     public function getEvents(bool $includeClosed = false)
     {
         $this->client = new Client();
-        $response = $this->client->request('GET', $this->buildQuery($this->apiUrl.Constants::EVENTS_PATH, [
+        $response = $this->request('GET', $this->apiUrl.Constants::EVENTS_PATH, [
             'include_closed' => ( $includeClosed ? 'true' : 'false' ),
             'include_without_sales' => true,
-        ]));
+        ]);
         /** @var Events $data */
         $data = $this->serializer->deserialize($response->getBody(), Events::class, 'json');
 
@@ -74,8 +137,9 @@ class WeezeventClient
      * @return Event|null
      * @throws GuzzleException
      */
-    public function getEvent(string $eventId)
+    public function getEvent(?string $eventId)
     {
+        if ( empty($eventId) ) { return null; }
         $events = $this->getEvents(true);
         foreach ($events as $event) {
             if ( $event->getId() === (int)$eventId ) {
@@ -182,7 +246,7 @@ class WeezeventClient
      */
     public function addParticipants(array $participants)
     {
-        if ( empty($participants) ) { return false; }
+        if ( empty($participants) ) { return []; }
         $this->client = new Client();
         $data = ['participants' => $participants, 'return_ticket_url' => false];
         $response = $this->client->request('POST', $this->buildQuery($this->apiUrl.Constants::PARTICIPANTS_PATH, []),
@@ -248,7 +312,16 @@ class WeezeventClient
      */
     private function buildQuery(string $url, array $params = [])
     {
-        $query = http_build_query(array_merge(['api_key' => $this->apiKey, 'access_token' => $this->apiToken], $params));
+        $query = http_build_query(array_merge(['api_key' => $this->apiKey, 'access_token' => $this->getToken()], $params));
         return $url.'?'.$query;
+    }
+
+    /**
+     * @return string
+     */
+    private function buildTokenQuery()
+    {
+        $query = http_build_query(['api_key' => $this->apiKey, 'username' => $this->apiUsername, 'password' => $this->apiPassword]);
+        return $this->apiUrl.Constants::ACCESS_TOKEN.'?'.$query;
     }
 }
