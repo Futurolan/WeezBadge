@@ -36,6 +36,7 @@ class FuturolanWeezeventExtension extends Extension
         $definition = $container->getDefinition('futurolan_weezevent.client.weezevent_client');
         $definition->setArgument(1, $config['api']['url']);
         $definition->setArgument(2, $config['api']['key']);
-        $definition->setArgument(3, $config['api']['token']);
+        $definition->setArgument(3, $config['api']['username']);
+        $definition->setArgument(4, $config['api']['password']);
     }
 }

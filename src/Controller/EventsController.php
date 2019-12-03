@@ -5,6 +5,8 @@ namespace App\Controller;
 
 use App\Service\ParameterService;
 use Futurolan\WeezeventBundle\Client\WeezeventClient;
+use Futurolan\WeezeventBundle\Entity\Participant;
+use Futurolan\WeezeventBundle\Entity\Team;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -51,10 +53,59 @@ class EventsController extends AbstractController
      */
     public function eventParticipantsByTicketAction(string $eventID, string $ticketID)
     {
+        $ticket = $this->weezeventClient->getTicket($eventID, $ticketID);
+        $participants = $this->weezeventClient->getParticipantsByTicket($ticketID);
+        if ( $ticket->getGroupSize() > 0 ) {
+            $isTeam = true;
+            $teams = $this->participantsToTeams($participants);
+            $participants = null;
+        } else {
+            $isTeam = false;
+            $teams = null;
+        }
+
         return $this->render("events/eventParticipants.html.twig", [
-            'ticket' => $this->weezeventClient->getTicket($eventID, $ticketID),
-            'participants' => $this->weezeventClient->getParticipantsByTicket($ticketID),
+            'ticket' => $ticket,
+            'isTeam' => $isTeam,
+            'teams' => $teams,
+            'participants' => $participants,
         ]);
+    }
+
+
+    /**
+     * @param Participant[] $participants
+     * @return Team[]
+     */
+    private function participantsToTeams(array $participants)
+    {
+        /** @var Team[] $teams */
+        $teams = [];
+        /** @var Participant $participant */
+        foreach($participants as $participant) {
+            if ( !key_exists($participant->getBuyer()->getIdAcheteur(), $teams) ) {
+                $team = new Team();
+                $team->setId($participant->getBuyer()->getIdAcheteur());
+                $team->setName($this->getTeamName($participant));
+                $team->setEmail($participant->getBuyer()->getEmailAcheteur());
+                $team->setOwnerFirstName($participant->getBuyer()->getAcheteurFirstName());
+                $team->setOwnerLastName($participant->getBuyer()->getAcheteurLastName());
+                $teams[$participant->getBuyer()->getIdAcheteur()] = $team;
+            }
+            $teams[$participant->getBuyer()->getIdAcheteur()]->addMember($participant);
+        }
+        return $teams;
+    }
+
+    /**
+     * @param Participant $participant
+     * @return string
+     */
+    private function getTeamName(Participant $participant) {
+        foreach ($participant->getBuyer()->getAnswers() as $anwser) {
+            if ( $anwser->getLabel() === "Dénomination de l'équipe" ) { return $anwser->getValue(); }
+        }
+        return (string)$participant->getBuyer()->getIdAcheteur();
     }
 
     /**

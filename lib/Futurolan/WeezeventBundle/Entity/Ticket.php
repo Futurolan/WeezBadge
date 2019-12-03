@@ -34,7 +34,7 @@ class Ticket
      * @var int
      * @Serializer\Type("int")
      */
-    private $group_size;
+    private $group_size = 0;
 
     /**
      * @var int

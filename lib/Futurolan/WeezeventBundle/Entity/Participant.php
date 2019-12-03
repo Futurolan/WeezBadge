@@ -4,6 +4,7 @@
 namespace Futurolan\WeezeventBundle\Entity;
 
 use JMS\Serializer\Annotation as Serializer;
+use \DateTime as DateTime;
 
 /**
  * Class Participant
@@ -66,7 +67,7 @@ class Participant
     private $comment;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      * @Serializer\Type("DateTime<'Y-m-d H:i:s'>")
      */
     private $create_date;
@@ -124,6 +125,12 @@ class Participant
      * @Serializer\Type("array<Futurolan\WeezeventBundle\Entity\Answer>")
      */
     private $answers;
+
+    /**
+     * @var Buyer
+     * @Serializer\Type("Futurolan\WeezeventBundle\Entity\Buyer")
+     */
+    private $buyer;
 
     /**
      * @return int
@@ -198,9 +205,9 @@ class Participant
     }
 
     /**
-     * @return \DateTime
+     * @return DateTime
      */
-    public function getCreateDate(): \DateTime
+    public function getCreateDate(): DateTime
     {
         return $this->create_date;
     }
@@ -275,5 +282,21 @@ class Participant
     public function getAnswers(): array
     {
         return $this->answers;
+    }
+
+    /**
+     * @return Buyer
+     */
+    public function getBuyer(): ?Buyer
+    {
+        return $this->buyer;
+    }
+
+    /**
+     * @param Buyer $buyer
+     */
+    public function setBuyer(Buyer $buyer): void
+    {
+        $this->buyer = $buyer;
     }
 }

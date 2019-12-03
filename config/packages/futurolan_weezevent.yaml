@@ -1,4 +1,5 @@
 futurolan_weezevent:
   api:
     key: '%env(WEEZEVENT_API_KEY)%'
-    token: '%env(WEEZEVENT_API_TOKEN)%'
+    username: '%env(WEEZEVENT_USERNAME)%'
+    password: '%env(WEEZEVENT_PASSWORD)%'

@@ -1,12 +1,15 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1 class="mb-4">{{ defaultEvent.name }}</h1>
-
-    <p>
-        Bienvenue sur l'application de gestion de badges pour l'événement {{ defaultEvent.name|title }}.
-        Cette application vous permet de créer, importer ou supprimer des badges.
-    </p>
+    {% if defaultEvent is not empty %}
+        <h1 class="mb-4">{{ defaultEvent.name }}</h1>
+        <p>
+            Bienvenue sur l'application de gestion de badges pour l'événement {{ defaultEvent.name|title }}.
+            Cette application vous permet de créer, importer ou supprimer des badges.
+        </p>
+    {% else %}
+        <h1>Aucun événement sélectionné</h1>
+    {% endif %}
 
     {% if tickets|length > 0 %}
         <div class="row mt-5">
