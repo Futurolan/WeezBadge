@@ -5,7 +5,7 @@ namespace App\Repository;
 
 use App\Entity\Parameter;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
  * Class LogRepository
@@ -15,9 +15,9 @@ class LogRepository extends ServiceEntityRepository
 {
     /**
      * LogRepository constructor.
-     * @param RegistryInterface $registry
+     * @param ManagerRegistry $registry
      */
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Parameter::class);
     }
