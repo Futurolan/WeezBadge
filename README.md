@@ -7,7 +7,7 @@ Requirements
 * MariaDB 10.2.7 or MySQL 5.7.8
 * [Composer](https://getcomposer.org/)
 * A [Google Oauth 2.0 API Key](https://developers.google.com/identity/protocols/OAuth2)
-* A Weezevent API Key and Token (contact Weezevent for getting one)
+* A Weezevent API Key (contact Weezevent for getting one)
 
 Installation / Update
 ---------------------
@@ -29,7 +29,8 @@ Create a file name '.env.local' in project root (weezevent/). This file will not
     
     # Weezevent
     WEEZEVENT_API_KEY=<weezevent api key>
-    WEEZEVENT_API_TOKEN=<weezevent api token>
+    WEEZEVENT_USERNAME=<weezevent username>
+    WEEZEVENT_PASSWORD=<weezevent password>
     
     # MySQL Database
     DATABASE_URL=mysql://user:password@127.0.0.1:3306/database
