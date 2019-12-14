@@ -43,13 +43,13 @@ class HomePageController extends AbstractController
     {
         if ( is_null($this->getUser()) ) { return $this->redirectToRoute('loginPage'); }
 
-//        if ( !$this->weezeventClient->isApiAccessValid() ) {
-//            if ( !$this->isGranted('ROLE_SUPER_ADMIN') ) {
-//                return $this->redirectToRoute('adminApiKeyPage');
-//            } else {
-//                return $this->redirectToRoute('apiErrorPage');
-//            }
-//        }
+        if ( !$this->weezeventClient->isApiAccessValid() ) {
+            if ( $this->isGranted('ROLE_SUPER_ADMIN') ) {
+                return $this->redirectToRoute('adminApiKeyPage');
+            } else {
+                return $this->redirectToRoute('apiErrorPage');
+            }
+        }
 
         $defaultEvent = $this->badgeController->getDefaultEvent();
         $tickets = $this->badgeController->getAllowedTickets();

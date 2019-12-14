@@ -296,7 +296,7 @@ class WeezeventClient
     /**
      * @param string $apiToken
      */
-    public function setApiToken(string $apiToken): void
+    public function setApiToken(?string $apiToken): void
     {
         $this->apiToken = $apiToken;
     }
