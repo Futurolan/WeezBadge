@@ -41,11 +41,17 @@ class HomePageController extends AbstractController
      */
     public function homePageAction()
     {
-        if (is_null($this->getUser())) { return $this->redirectToRoute('loginPage'); }
+        if ( is_null($this->getUser()) ) { return $this->redirectToRoute('loginPage'); }
 
-        $defaultCategory = $this->parameterService->get($this->parameterService::DEFAULT_CATEGORY_NAME);
-        $defaultEvent = $this->weezeventClient->getEvent($defaultCategory['eventID']);
+//        if ( !$this->weezeventClient->isApiAccessValid() ) {
+//            if ( !$this->isGranted('ROLE_SUPER_ADMIN') ) {
+//                return $this->redirectToRoute('adminApiKeyPage');
+//            } else {
+//                return $this->redirectToRoute('apiErrorPage');
+//            }
+//        }
 
+        $defaultEvent = $this->badgeController->getDefaultEvent();
         $tickets = $this->badgeController->getAllowedTickets();
 
         return $this->render("home/home.html.twig", [
@@ -68,5 +74,13 @@ class HomePageController extends AbstractController
     public function logoutPageAction()
     {
         return $this->redirectToRoute('homePage');
+    }
+
+    /**
+     * @Route("/apiError", name="apiErrorPage")
+     */
+    public function apiErrorPageAction()
+    {
+        return $this->render("home/apiError.html.twig", []);
     }
 }

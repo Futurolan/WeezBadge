@@ -23,13 +23,21 @@ class EventsController extends AbstractController
     /** @var WeezeventClient */
     private $weezeventClient;
 
+    /** @var ParameterService */
+    private $parameterService;
+
     /**
      * listEventsController constructor.
      * @param WeezeventClient $weezeventClient
+     * @param ParameterService $parameterService
      */
-    public function __construct(WeezeventClient $weezeventClient)
+    public function __construct(WeezeventClient $weezeventClient, ParameterService $parameterService)
     {
         $this->weezeventClient = $weezeventClient;
+        $this->parameterService = $parameterService;
+
+        $this->weezeventClient->setApiKey($this->parameterService->get($this->parameterService::API_KEY));
+        $this->weezeventClient->setApiToken($this->parameterService->get($this->parameterService::API_TOKEN));
     }
 
     /**

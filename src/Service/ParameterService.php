@@ -12,8 +12,9 @@ use Doctrine\ORM\EntityManagerInterface;
  */
 class ParameterService
 {
-
     const DEFAULT_CATEGORY_NAME = 'DefaultCategory';
+    const API_KEY = 'apiKey';
+    const API_TOKEN = 'apiToken';
 
     /** @var EntityManagerInterface */
     private $em;
@@ -35,13 +36,22 @@ class ParameterService
     {
         $param = $this->em->getRepository(Parameter::class)->findOneBy(['name' => $name]);
         if ( !$param instanceof Parameter) { return null; }
-        return $param->getValue();
+
+        $value = $param->getValue();
+        if ( count($value) === 1 && key_exists('value', $value) ) { $value = $value['value']; }
+        return $value;
     }
 
-    public function set(string $name, ?array $value)
+    /**
+     * @param string $name
+     * @param $value
+     */
+    public function set(string $name, $value)
     {
         $param = $this->em->getRepository(Parameter::class)->findOneBy(['name' => $name]);
         if (!$param instanceof Parameter) { $param = new Parameter(); }
+        if ( !is_array($value) ) { $value = ['value' => $value]; }
+
         $param->setName($name);
         $param->setValue($value);
 

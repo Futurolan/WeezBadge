@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1 class="mb-4">Token API</h1>
+    {{ form_start(apiKeyForm) }}
+    {{ form_row(apiKeyForm.apiToken) }}
+    <a href="{{ path('adminPage') }}" class="btn btn-secondary">Retour</a>
+    <button id="regen_api_token" class="btn btn-info" title="Regénérer le token API"><i class="fas fa-sync"></i></button>
+    <button type="submit" class="btn btn-primary" formnovalidate>Enregistrer</button>
+    {{ form_end(apiKeyForm) }}
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $(function() {
+            $('#regen_api_token').on('click', function(e){
+                e.preventDefault();
+                $.get("{{ path('adminApiRegenTokenApi') }}")
+                .done(function(data){
+                    $('#api_key_form_apiToken').val(data.data);
+                })
+                .fail(function(data){
+                    $('.mainContainer').before(
+                        $('<div></div>').addClass('alert alert-danger alert-dismissible fade show').attr('role', 'alert').html(
+                            data.responseJSON.error
+                        ).append(
+                            $('<button></button>').addClass('close').attr('data-dismiss', 'alert').html(
+                                $('<span></span>').attr('aria-hidden', 'true').html('&times;')
+                            )
+                        )
+                    );
+                });
+            });
+        });
+    </script>
+{% endblock %}

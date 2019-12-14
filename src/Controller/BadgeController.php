@@ -13,6 +13,7 @@ use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Futurolan\WeezeventBundle\Client\WeezeventClient;
+use Futurolan\WeezeventBundle\Entity\Event;
 use Futurolan\WeezeventBundle\Entity\ParticipantForm;
 use Futurolan\WeezeventBundle\Entity\ParticipantPost;
 use Futurolan\WeezeventBundle\Entity\Ticket;
@@ -65,6 +66,18 @@ class BadgeController extends AbstractController
         $this->weezeventClient = $weezeventClient;
         $this->parameterService = $parameterService;
         $this->validator = $validator;
+
+        $this->weezeventClient->setApiToken($this->parameterService->get($this->parameterService::API_TOKEN));
+    }
+
+    /**
+     * @return Event|null
+     * @throws GuzzleException
+     */
+    public function getDefaultEvent()
+    {
+        $defaultCategory = $this->parameterService->get($this->parameterService::DEFAULT_CATEGORY_NAME);
+        return $this->weezeventClient->getEvent($defaultCategory['eventID']);
     }
 
     /**

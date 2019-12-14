@@ -60,11 +60,9 @@ class Acl
      */
     public function rolesToAcl(?array $roles): void
     {
-        dump($roles);
         if (is_array($roles) ) {
             foreach($roles as $role) {
                 if ( preg_match('/^ROLE_(?<eventId>\d+)_(?<ticketId>\d+)$/', $role, $matches) ) {
-                    dump($matches);
                     if ( (int)$matches['eventId'] === $this->getEventId() ) {
                         $this->addAllowedTIckets($matches['ticketId']);
                     }

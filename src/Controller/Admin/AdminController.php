@@ -42,6 +42,14 @@ class AdminController extends AbstractController
             ];
         }
 
+        if ( $this->isGranted('ROLE_SUPER_ADMIN') ) {
+            $modules[] = [
+                'name' => "Token API",
+                'route' => 'adminApiKeyPage',
+                'icon' => 'fas fa-key',
+            ];
+        }
+
         return $this->render("admin/adminPage.html.twig", [
             'modules' => $modules,
         ]);
