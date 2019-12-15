@@ -36,7 +36,6 @@ class EventsController extends AbstractController
         $this->weezeventClient = $weezeventClient;
         $this->parameterService = $parameterService;
 
-        $this->weezeventClient->setApiKey($this->parameterService->get($this->parameterService::API_KEY));
         $this->weezeventClient->setApiToken($this->parameterService->get($this->parameterService::API_TOKEN));
     }
 
